@@ -3,7 +3,6 @@
 #define THIRD_PERSON_ARM_LENGTH 300.0f
 
 #include "PlayerBase.h"
-#include "Camera/CameraComponent.h"
 
 // Sets default values
 APlayerBase::APlayerBase()
@@ -19,6 +18,52 @@ void APlayerBase::TogglePerspective(const FInputActionValue& value)
 {
 	if (PerspectiveMode == EPerspectiveMode::FirstPerson) SetPerspectiveMode(EPerspectiveMode::ThirdPerson);
 	else SetPerspectiveMode(EPerspectiveMode::FirstPerson);
+}
+
+void APlayerBase::MoveInput(const FInputActionValue& Value)
+{
+	const FVector2D Axis = Value.Get<FVector2D>();
+	if (!Controller) return;
+	
+	const FRotator ControlRot = Controller->GetControlRotation();
+	const FRotator YawRot(0.f, ControlRot.Yaw, 0.f);
+	
+	const FVector Forward = FRotationMatrix(YawRot).GetUnitAxis(EAxis::X);
+	const FVector Right	  = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y);
+	
+	AddMovementInput(Forward, Axis.X);
+	AddMovementInput(Right, Axis.Y);
+}
+
+void APlayerBase::LookInput(const FInputActionValue& Value)
+{
+	const FVector2D Axis = Value.Get<FVector2D>();
+	AddControllerYawInput(Axis.X);
+	AddControllerPitchInput(Axis.Y);
+}
+
+void APlayerBase::JumpInput(const FInputActionValue& Value)
+{
+}
+
+void APlayerBase::OnMouseLB_Implementation()
+{
+}
+
+void APlayerBase::OnMouseRB_Implementation()
+{
+}
+
+void APlayerBase::OnE_Implementation()
+{
+}
+
+void APlayerBase::OnF_Implementation()
+{
+}
+
+void APlayerBase::OnShift_Implementation()
+{
 }
 
 void APlayerBase::SetPerspectiveMode(EPerspectiveMode NewMode)
@@ -55,6 +100,20 @@ void APlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
 	ApplyPerspectiveVisibility();
+	
+	// Input Mapping
+	APlayerController* PC = Cast<APlayerController>(Controller);
+	if (!PC) return;
+	ULocalPlayer* LP = PC->GetLocalPlayer();
+	if (!LP) return;
+	
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+	{
+		if (InputMappingContext)
+		{
+			Subsystem->AddMappingContext(InputMappingContext, 0);
+		}
+	}
 }
 
 // Called every frame
@@ -68,6 +127,17 @@ void APlayerBase::Tick(float DeltaTime)
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	
+	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (!EIC) return;
+	
+	if (IA_Move) EIC->BindAction(IA_Move, ETriggerEvent::Triggered, this, &APlayerBase::MoveInput);
+	if (IA_Look) EIC->BindAction(IA_Look, ETriggerEvent::Triggered, this, &APlayerBase::LookInput);
 
+	if (IA_Jump)
+	{
+		EIC->BindAction(IA_Jump, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EIC->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	}
 }
 

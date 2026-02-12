@@ -6,8 +6,10 @@
 #include "ProjectOverwatchCharacter.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "Camera/CameraComponent.h"
 #include "PlayerBase.generated.h"
-#include "InputActionValue.h"
 
 UENUM(BlueprintType)
 enum class EPerspectiveMode : uint8
@@ -45,21 +47,31 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	void TogglePerspective(const FInputActionValue& value);			
 	
+	// Input Assets
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	UInputMappingContext* InputMappingContext;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	UInputAction* IA_Move;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	UInputAction* IA_Look;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	UInputAction* IA_Jump;
+	
+	// 플레이어 기본 Movement
+	void MoveInput(const FInputActionValue& Value);
+	void LookInput(const FInputActionValue& Value);
+	void JumpInput(const FInputActionValue& Value);
+	
 	// 공용 입력 엔트리 (E스킬, F키, Shift ...) (BP/C++에서 Override 가능)
 	UFUNCTION(BlueprintCallable, Category="Input")
-	void OnMouseLB();
 	virtual void OnMouseLB_Implementation();	// 일반 공격
 	UFUNCTION(BlueprintCallable, Category="Input")
-	void OnMouseRB();
 	virtual void OnMouseRB_Implementation();	// 일반 공격 2
 	UFUNCTION(BlueprintCallable, Category="Input")
-	void OnE();
 	virtual void OnE_Implementation();			// E 스킬
 	UFUNCTION(BlueprintCallable, Category="Input")
-	void OnF();
 	virtual void OnF_Implementation();			// F 키 입력
 	UFUNCTION(BlueprintCallable, Category="Input")
-	void OnShift();
 	virtual void OnShift_Implementation();		// 쉬프트 키 스킬
 
 	// 카메라/에임
@@ -82,6 +94,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override final;
 
 };
