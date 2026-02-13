@@ -98,6 +98,7 @@ void APlayerBase::ApplyPerspectiveVisibility()
 	// FP : 손, 팔만 보이도록 몸은 숨김
 	if (PerspectiveMode == EPerspectiveMode::FirstPerson)
 	{
+		SkeletalMesh.
 		GetMesh()->SetOwnerNoSee(true);
 	}
 	// TP : 전신 보이도록 설정
