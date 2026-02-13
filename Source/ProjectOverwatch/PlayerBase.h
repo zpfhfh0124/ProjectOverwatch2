@@ -48,19 +48,21 @@ public:
 	void TogglePerspective(const FInputActionValue& value);			
 	
 	// Input Assets
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputMappingContext* InputMappingContext;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_Move;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
-	UInputAction* IA_Look;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_LookYaw;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_LookPitch;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_Jump;
 	
 	// 플레이어 기본 Movement
 	void MoveInput(const FInputActionValue& Value);
-	void LookInput(const FInputActionValue& Value);
-	void JumpInput(const FInputActionValue& Value);
+	void LookYawInput(const FInputActionValue& Value);
+	void LookPitchInput(const FInputActionValue& Value);
 	
 	// 공용 입력 엔트리 (E스킬, F키, Shift ...) (BP/C++에서 Override 가능)
 	UFUNCTION(BlueprintCallable, Category="Input")

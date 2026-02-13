@@ -12,6 +12,10 @@ APlayerBase::APlayerBase()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(FName("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->TargetArmLength = 0.0f;
+	SpringArm->bUsePawnControlRotation = true;
+	
+	FPCamera = CreateDefaultSubobject<UCameraComponent>(FName("Camera"));
+	FPCamera->SetupAttachment(SpringArm);
 }
 
 void APlayerBase::TogglePerspective(const FInputActionValue& value)
@@ -35,16 +39,24 @@ void APlayerBase::MoveInput(const FInputActionValue& Value)
 	AddMovementInput(Right, Axis.Y);
 }
 
-void APlayerBase::LookInput(const FInputActionValue& Value)
+void APlayerBase::LookYawInput(const FInputActionValue& Value)
+{
+	const float Axis = Value.Get<float>();
+	AddControllerYawInput(Axis);
+}
+
+void APlayerBase::LookPitchInput(const FInputActionValue& Value)
+{
+	const float Axis = Value.Get<float>();
+	AddControllerPitchInput(Axis);
+}
+
+/*void APlayerBase::LookInput(const FInputActionValue& Value)
 {
 	const FVector2D Axis = Value.Get<FVector2D>();
 	AddControllerYawInput(Axis.X);
 	AddControllerPitchInput(Axis.Y);
-}
-
-void APlayerBase::JumpInput(const FInputActionValue& Value)
-{
-}
+}*/
 
 void APlayerBase::OnMouseLB_Implementation()
 {
@@ -132,7 +144,8 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	if (!EIC) return;
 	
 	if (IA_Move) EIC->BindAction(IA_Move, ETriggerEvent::Triggered, this, &APlayerBase::MoveInput);
-	if (IA_Look) EIC->BindAction(IA_Look, ETriggerEvent::Triggered, this, &APlayerBase::LookInput);
+	if (IA_LookYaw) EIC->BindAction(IA_LookYaw, ETriggerEvent::Triggered, this, &APlayerBase::LookYawInput);
+	if (IA_LookPitch) EIC->BindAction(IA_LookPitch, ETriggerEvent::Triggered, this, &APlayerBase::LookPitchInput);
 
 	if (IA_Jump)
 	{
