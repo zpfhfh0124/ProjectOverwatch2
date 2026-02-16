@@ -34,10 +34,17 @@ public:
 	float LifeSeconds = 5.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Shuriken")
-	bool bUseLifeSpan = false;
+	bool IsFiring = false;
 
-	// 투척 방향, 속도 세팅
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Shuriken")
+	float SpinSpeed = 2000.f;
+
+	UFUNCTION(BlueprintCallable, Category = "Shuriken")
+	// 투척 (방향 및 속도 세팅)
 	void FireInDirection(const FVector& ShootDir);
+
+	// 회전
+	void RotateInDirection(const FRotator& Rot);
 	
 protected:
 	// Called when the game starts or when spawned

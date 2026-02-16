@@ -58,6 +58,18 @@ public:
 	UInputAction* IA_LookPitch;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_Jump;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_AttackLB;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_AttackRB;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_E;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_F;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_R;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Shift;
 	
 	// 플레이어 기본 Movement
 	void MoveInput(const FInputActionValue& Value);
@@ -65,16 +77,18 @@ public:
 	void LookPitchInput(const FInputActionValue& Value);
 	
 	// 공용 입력 엔트리 (E스킬, F키, Shift ...) (BP/C++에서 Override 가능)
-	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void OnMouseLB_Implementation();	// 일반 공격
-	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void OnMouseRB_Implementation();	// 일반 공격 2
-	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void OnE_Implementation();			// E 스킬
-	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void OnF_Implementation();			// F 키 입력
-	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void OnShift_Implementation();		// 쉬프트 키 스킬
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
+	void OnMouseLB();	// 일반 공격
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
+	void OnMouseRB();	// 일반 공격 2
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
+	void OnE();			// E 스킬
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
+	void OnF();			// F 키 입력
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
+	void OnR();			// R 키 입력
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
+	void OnShift();		// 쉬프트 키 스킬
 
 	// 카메라/에임
 	UFUNCTION(BlueprintCallable, Category="Camera")
@@ -82,7 +96,7 @@ public:
 	UFUNCTION(BlueprintPure, Category="Camera")
 	EPerspectiveMode GetPerspectiveMode() const { return PerspectiveMode; }
 	UFUNCTION(BlueprintCallable, Category="Combat")
-	void GetAimView(FVector& OutLocation, FRotator& OutRotation) const;
+	FVector GetAimCrosshair() const;
 	
 private:
 	void ApplyPerspectiveVisibility();

@@ -40,14 +40,23 @@ AShuriken::AShuriken()
 
 void AShuriken::FireInDirection(const FVector& ShootDir)
 {
+	IsFiring = true;
 	ProjectileMovement->Velocity = ShootDir * ProjectileMovement->InitialSpeed;
+	ProjectileMovement->Activate();
+	// 소멸 시한 설정 (투척시에만)
+	SetLifeSpan(LifeSeconds);
+}
+
+void AShuriken::RotateInDirection(const FRotator& Rot)
+{
+	SkMesh->AddLocalRotation(Rot);
 }
 
 void AShuriken::OnHit(UPrimitiveComponent* HitComp,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		FVector NormalImpulse,
-		const FHitResult& Hit)
+                      AActor* OtherActor,
+                      UPrimitiveComponent* OtherComp,
+                      FVector NormalImpulse,
+                      const FHitResult& Hit)
 {
 	if (!OtherActor || OtherActor == this) return;
 
@@ -71,9 +80,7 @@ void AShuriken::OnHit(UPrimitiveComponent* HitComp,
 void AShuriken::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// 소멸 시한 설정 (투척시에만)
-	if (bUseLifeSpan) SetLifeSpan(LifeSeconds);
+	IsFiring = false;
 }
 
 // Called every frame
@@ -81,5 +88,10 @@ void AShuriken::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsFiring)
+	{
+		// 회전
+		RotateInDirection(FRotator(0.f, SpinSpeed * DeltaTime, 0.f));
+	}
 }
 
