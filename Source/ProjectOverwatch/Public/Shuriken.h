@@ -8,6 +8,7 @@
 #include "Shuriken.generated.h"
 
 class USphereComponent;
+class APlayerBase;
 
 UCLASS()
 class PROJECTOVERWATCH_API AShuriken : public AActor
@@ -62,3 +63,6 @@ private:
 		FVector NormalImpulse,
 		const FHitResult& Hit);
 };
+
+
+
