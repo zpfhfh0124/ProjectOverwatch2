@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AJunCharacter::AJunCharacter()
@@ -37,6 +38,17 @@ AJunCharacter::AJunCharacter()
 	FPSCamComp->bUsePawnControlRotation = false;
 	
 	bUseControllerRotationYaw = true;
+	//2단 점프
+	JumpMaxCount = 2;
+	
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true; // 또는 bCanCrouch 설정
+	// GetCharacterMovement()->CrouchedHalfHeight = 60.f; // 필요하면
+	
+	auto* MoveComp = GetCharacterMovement();
+	
+	MoveComp->bCanWalkOffLedges = true;
+	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
+	
 }
 
 // Called when the game starts or when spawned
@@ -60,7 +72,14 @@ void AJunCharacter::BeginPlay()
 void AJunCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (bIsCrouched && GetCharacterMovement() && GetCharacterMovement()->IsFalling())
+	{
+		UnCrouch();
+	}
 
+	
+	PlayerMove();
 }
 
 // Called to bind functionality to input
@@ -72,7 +91,41 @@ void AJunCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	if (PlayerInput)
 	{
 		PlayerInput->BindAction(IA_JunLook, ETriggerEvent::Triggered, this, &AJunCharacter::look);
+		PlayerInput->BindAction(IA_JunMove, ETriggerEvent::Triggered, this, &AJunCharacter::move);
+		PlayerInput->BindAction(IA_JunJump, ETriggerEvent::Triggered, this, &AJunCharacter::jump);
+		PlayerInput->BindAction(IA_JunCrouch, ETriggerEvent::Started, this, &AJunCharacter::crouch);
+		PlayerInput->BindAction(IA_JunCrouch, ETriggerEvent::Completed, this, &AJunCharacter::stopcrouch);
+
 	}
+}
+
+void AJunCharacter::jump(const struct FInputActionValue& inputValue)
+{
+	Jump();
+}
+
+void AJunCharacter::crouch(const struct FInputActionValue& inputValue)
+{
+	if (GetCharacterMovement() && GetCharacterMovement()->IsFalling())
+	{
+		return; // 공중이면 앉기 금지
+	}
+
+	Crouch();
+}
+
+void AJunCharacter::stopcrouch(const struct FInputActionValue& inputValue)
+{
+	UnCrouch();
+}
+
+void AJunCharacter::move(const struct FInputActionValue& inputValue)
+{
+	FVector2D value = inputValue.Get<FVector2D>();
+	//상하 입력 이벤트 처리
+	direction.X = value.X;
+	//좌우 입력
+	direction.Y = value.Y;
 }
 
 void AJunCharacter::look(const FInputActionValue& inputValue)
@@ -80,4 +133,18 @@ void AJunCharacter::look(const FInputActionValue& inputValue)
 	FVector2D value = inputValue.Get<FVector2D>();
 	AddControllerYawInput(value.X);
 	AddControllerPitchInput(-value.Y);
+}
+
+void AJunCharacter::PlayerMove()
+{
+	//플레이어 이동 처리
+	//등속 운동
+	//P = P0 + vt
+	direction = FTransform(GetActorRotation()).TransformVector(direction);
+	/*FVector P0 = GetActorLocation();
+	FVector vt = direction * walkSpeed * DeltaTime;
+	FVector P = P0 + vt;
+	SetActorLocation(P);*/
+	AddMovementInput(direction);
+	direction = FVector::ZeroVector;
 }

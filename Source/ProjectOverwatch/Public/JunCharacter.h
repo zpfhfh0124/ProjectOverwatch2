@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "JunCharacter.generated.h"
 
+struct FInputActionValue;
+
 UCLASS()
 class PROJECTOVERWATCH_API AJunCharacter : public ACharacter
 {
@@ -36,6 +38,33 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	class UInputAction* IA_JunLook;
 	
+	//마우스 인풋 시점
 	void look(const FInputActionValue& inputValue);
 
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	class UInputAction* IA_JunMove;
+	//이동 속도
+	UPROPERTY(EditDefaultsOnly, Category=PlayerSetting)
+	float walkSpeed = 600;
+	//이동 방향
+	FVector direction;
+	
+	void move(const struct FInputActionValue& inputValue);
+	
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	class UInputAction* IA_JunJump;
+	//점프 입력 이벤트 처리 함수
+	void jump(const struct FInputActionValue& inputValue);
+	
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	class UInputAction* IA_JunCrouch;
+	//앉기 입력 이벤트 처리 함수
+	void crouch(const struct FInputActionValue& inputValue);
+	
+	//앉기 끝
+	void stopcrouch(const struct FInputActionValue& inputValue);
+	
+	//플레이어 이동처리
+	void PlayerMove();
+	
 };
