@@ -44,6 +44,7 @@ void AJunCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	//아래에 컨트롤러에 enhancedinputsystem 넣어주는거
 	auto pc = Cast<APlayerController>(Controller);
 	if (pc)
 	{
