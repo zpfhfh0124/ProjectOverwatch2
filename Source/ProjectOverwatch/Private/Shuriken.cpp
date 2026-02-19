@@ -74,6 +74,11 @@ void AShuriken::RotateInDirection(const FRotator& Rot)
 	SkMesh->AddLocalRotation(Rot);
 }
 
+void AShuriken::SetSocketName(const FName& SocketName)
+{
+	AttachedSocketName = SocketName;
+}
+
 void AShuriken::OnHit(UPrimitiveComponent* HitComp,
                       AActor* OtherActor,
                       UPrimitiveComponent* OtherComp,
