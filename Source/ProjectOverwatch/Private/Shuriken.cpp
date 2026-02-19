@@ -3,7 +3,6 @@
 
 #include "Shuriken.h"
 
-#include "PlayerBase.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
@@ -12,7 +11,7 @@
 AShuriken::AShuriken()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	// Collision 초기 설정 (장착중에는 콜리전 off)
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
@@ -113,8 +112,8 @@ void AShuriken::Tick(float DeltaTime)
 
 	if (IsFiring)
 	{
-		// 회전
-		RotateInDirection(FRotator(0.f, SpinSpeed * DeltaTime, 0.f));
+		// 회전 YZX 
+		RotateInDirection(FRotator(SpinSpeed * DeltaTime, 0.f, 0.f));
 	}
 }
 
