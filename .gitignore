@@ -41,6 +41,7 @@
 *.VC.db
 *.VC.opendb
 .vsconfig
+*.sln.DotSettings.user
 
 # Precompiled Assets
 SourceArt/**/*.png
