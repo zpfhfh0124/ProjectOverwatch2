@@ -4,6 +4,9 @@
 
 #include "PlayerBase.h"
 
+#include "InputMappingContext.h"
+#include "InputState.h"
+
 // Sets default values
 APlayerBase::APlayerBase()
 {
@@ -51,14 +54,7 @@ void APlayerBase::LookPitchInput(const FInputActionValue& Value)
 	AddControllerPitchInput(Axis);
 }
 
-/*void APlayerBase::LookInput(const FInputActionValue& Value)
-{
-	const FVector2D Axis = Value.Get<FVector2D>();
-	AddControllerYawInput(Axis.X);
-	AddControllerPitchInput(Axis.Y);
-}*/
-
-void APlayerBase::OnMouseLB_Implementation()
+void APlayerBase::OnE_Implementation()
 {
 }
 
@@ -66,11 +62,15 @@ void APlayerBase::OnMouseRB_Implementation()
 {
 }
 
-void APlayerBase::OnE_Implementation()
+void APlayerBase::OnMouseLB_Implementation()
 {
 }
 
 void APlayerBase::OnF_Implementation()
+{
+}
+
+void APlayerBase::OnR_Implementation()
 {
 }
 
@@ -89,8 +89,26 @@ void APlayerBase::SetPerspectiveMode(EPerspectiveMode NewMode)
 	ApplyPerspectiveVisibility();
 }
 
-void APlayerBase::GetAimView(FVector& OutLocation, FRotator& OutRotation) const
+FVector APlayerBase::GetAimCrosshair() const
 {
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC) return GetActorForwardVector();
+
+	int32 SizeX, SizeY;
+	PC->GetViewportSize(SizeX, SizeY);
+
+	FVector WorldOrigin;
+	FVector WorldDirection;
+
+	PC->DeprojectScreenPositionToWorld(SizeX * 0.5f, SizeY * 0.5f, WorldOrigin, WorldDirection);
+
+	FVector End = WorldOrigin + WorldDirection * 100000.f;
+
+	FHitResult Hit;
+	GetWorld()->LineTraceSingleByChannel(Hit, WorldOrigin, End, ECC_Visibility);
+
+	FVector TargetPoint = Hit.bBlockingHit ? Hit.ImpactPoint : End;
+	return TargetPoint;
 }
 
 void APlayerBase::ApplyPerspectiveVisibility()
@@ -98,7 +116,7 @@ void APlayerBase::ApplyPerspectiveVisibility()
 	// FP : 손, 팔만 보이도록 몸은 숨김
 	if (PerspectiveMode == EPerspectiveMode::FirstPerson)
 	{
-		GetMesh()->SetOwnerNoSee(true);
+		//GetMesh()->SetOwnerNoSee(true);
 	}
 	// TP : 전신 보이도록 설정
 	else
@@ -152,5 +170,12 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EIC->BindAction(IA_Jump, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EIC->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	}
+	
+	EIC->BindAction(IA_AttackLB, ETriggerEvent::Started, this, &APlayerBase::OnMouseLB);
+	EIC->BindAction(IA_AttackRB, ETriggerEvent::Started, this, &APlayerBase::OnMouseRB);
+	EIC->BindAction(IA_E, ETriggerEvent::Started, this, &APlayerBase::OnE);
+	EIC->BindAction(IA_F, ETriggerEvent::Started, this, &APlayerBase::OnF);
+	EIC->BindAction(IA_R, ETriggerEvent::Started, this, &APlayerBase::OnR);
+	EIC->BindAction(IA_Shift, ETriggerEvent::Started, this, &APlayerBase::OnShift);
 }
 
