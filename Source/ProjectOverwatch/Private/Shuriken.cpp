@@ -121,7 +121,7 @@ void AShuriken::Tick(float DeltaTime)
 		RotateInDirection(FRotator(SpinSpeed * DeltaTime, 0.f, 0.f));
 		FString name = GetActorNameOrLabel();
 		FVector vector = GetActorLocation();
-		UE_LOG(LogTemp, Warning, TEXT("%s Location : (%.2f, %.2f, %.2f)"), *name, vector.X, vector.Y, vector.Z);
+		//UE_LOG(LogTemp, Warning, TEXT("%s Location : (%.2f, %.2f, %.2f)"), *name, vector.X, vector.Y, vector.Z);
 	}
 }
 
