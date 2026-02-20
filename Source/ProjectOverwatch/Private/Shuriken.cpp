@@ -60,7 +60,7 @@ void AShuriken::FireInDirection(const FVector& ShootDir)
 	// 투사체 설정
 	ProjectileMovement->StopMovementImmediately();
 	ProjectileMovement->SetUpdatedComponent(Collision);
-	ProjectileMovement->ProjectileGravityScale = 0.2f;
+	//ProjectileMovement->ProjectileGravityScale = 0.2f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->Velocity = ShootDir.GetSafeNormal() * ProjectileMovement->InitialSpeed;
 	ProjectileMovement->Activate(true);
@@ -119,6 +119,9 @@ void AShuriken::Tick(float DeltaTime)
 	{
 		// 회전 YZX 
 		RotateInDirection(FRotator(SpinSpeed * DeltaTime, 0.f, 0.f));
+		FString name = GetActorNameOrLabel();
+		FVector vector = GetActorLocation();
+		UE_LOG(LogTemp, Warning, TEXT("%s Location : (%.2f, %.2f, %.2f)"), *name, vector.X, vector.Y, vector.Z);
 	}
 }
 

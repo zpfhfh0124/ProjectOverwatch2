@@ -96,7 +96,7 @@ public:
 	UFUNCTION(BlueprintPure, Category="Camera")
 	EPerspectiveMode GetPerspectiveMode() const { return PerspectiveMode; }
 	UFUNCTION(BlueprintCallable, Category="Combat")
-	FVector GetAimCrosshair() const;
+	FVector GetForwardDir() const;
 	
 private:
 	void ApplyPerspectiveVisibility();
