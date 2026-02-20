@@ -27,13 +27,13 @@ protected:
 	
 	/** Called from Input Actions for attack input */
 	UFUNCTION(BlueprintCallable, Category="Input")
-	void MouseLBStart(const FInputActionValue& Value);
+	void MouseLBStart();
 	/** Called from Input Actions for attack input */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	void MouseLBTrigger(const FInputActionValue& Value);
 	/** Called from Input Actions for attack input */
 	UFUNCTION(BlueprintCallable, Category="Input")
-	void MouseLBComplete(const FInputActionValue& Value);
+	void MouseLBComplete();
 	
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;

@@ -5,8 +5,11 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "InputActionValue.h"
+#include "Components/SphereComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 APlayer_WuYang::APlayer_WuYang()
 {
@@ -27,7 +30,7 @@ void APlayer_WuYang::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	{
 		//LB
 		EnhancedInputComponent->BindAction(MouseLBAction, ETriggerEvent::Started, this, &APlayer_WuYang::MouseLBStart);
-		//EnhancedInputComponent->BindAction(MouseLBAction, ETriggerEvent::Triggered, this, &APlayer_WuYang::MouseLBTrigger);
+		EnhancedInputComponent->BindAction(MouseLBAction, ETriggerEvent::Triggered, this, &APlayer_WuYang::MouseLBTrigger);
 		EnhancedInputComponent->BindAction(MouseLBAction, ETriggerEvent::Completed, this, &APlayer_WuYang::MouseLBComplete);
 	}
 	else
@@ -35,18 +38,51 @@ void APlayer_WuYang::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	}
 }
 
-void APlayer_WuYang::MouseLBStart(const FInputActionValue& Value)
+void APlayer_WuYang::MouseLBStart()
 {
-	UE_LOG(LogTemp, Warning, TEXT("=== 마우스클릭 함수 시작 ==="));
 	SpawnWaterBall();
 }
 
 void APlayer_WuYang::MouseLBTrigger(const FInputActionValue& Value)
 {
-	
+	// 1. 워터볼이 있는지, 그리고 유효한지 체크
+	if (!CurrentWaterBall) return;
+
+	UProjectileMovementComponent* MoveComp = CurrentWaterBall->FindComponentByClass<UProjectileMovementComponent>();
+	// 이미지에서는 Sphere(컴포넌트)의 위치를 기준으로 계산하므로 가져옵니다.
+	USceneComponent* SphereComp = Cast<USceneComponent>(CurrentWaterBall->GetComponentByClass(USphereComponent::StaticClass()));
+
+	if (MoveComp && SphereComp)
+	{
+		// 2. 카메라 정보 가져오기 (이미지의 Get Player Camera Manager 부분)
+		if (!FirstPersonCameraComponent) return;
+
+		FVector CameraLoc = FirstPersonCameraComponent->GetComponentLocation();
+		FVector CameraForward = FirstPersonCameraComponent->GetForwardVector();
+
+		// 3. 목표 위치 계산 (카메라 앞 특정 지점)
+		// 이미지의 복잡한 더하기 빼기 로직을 정리하면 결국 '카메라 앞 쪽에 유지'입니다.
+		FVector TargetLocation = CameraForward * 300.0f;
+
+		// 4. VInterp To (부드러운 위치 추적)
+		FVector CurrentLoc = SphereComp->GetComponentLocation();
+		
+		float farLength = (CurrentLoc - CameraLoc).Length();
+		FVector tempTargetLocation = CameraForward * farLength + CameraLoc;
+		FVector interpVector = (tempTargetLocation - CurrentLoc) * 6.0f;
+		float DeltaTime = GetWorld()->GetDeltaSeconds();
+        
+		// 이미지의 Interp Speed 150.0 반영
+		FVector NextLocation = UKismetMathLibrary::VInterpTo(MoveComp->Velocity, TargetLocation, DeltaTime, 150.0f);
+
+		// 5. Velocity 설정 (이미지의 마지막 SET Velocity 부분)
+		// 새로운 위치와 현재 위치의 차이를 이용해 속도를 계산하거나 직접 위치를 업데이트합니다.
+		// 이미지에서는 Velocity를 직접 건드리므로:
+		MoveComp->Velocity = NextLocation + interpVector;
+	}
 }
 
-void APlayer_WuYang::MouseLBComplete(const FInputActionValue& Value)
+void APlayer_WuYang::MouseLBComplete()
 {
 	// 1. Is Valid 체크 (이미지의 ? Is Valid 노드)
 	if (CurrentWaterBall && CurrentWaterBall->IsValidLowLevel())
