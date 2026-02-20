@@ -27,7 +27,7 @@ void APlayer_WuYang::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	{
 		//LB
 		EnhancedInputComponent->BindAction(MouseLBAction, ETriggerEvent::Started, this, &APlayer_WuYang::MouseLBStart);
-		EnhancedInputComponent->BindAction(MouseLBAction, ETriggerEvent::Triggered, this, &APlayer_WuYang::MouseLBTrigger);
+		//EnhancedInputComponent->BindAction(MouseLBAction, ETriggerEvent::Triggered, this, &APlayer_WuYang::MouseLBTrigger);
 		EnhancedInputComponent->BindAction(MouseLBAction, ETriggerEvent::Completed, this, &APlayer_WuYang::MouseLBComplete);
 	}
 	else
@@ -35,19 +35,37 @@ void APlayer_WuYang::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	}
 }
 
-void APlayer_WuYang::MouseLBStart()
+void APlayer_WuYang::MouseLBStart(const FInputActionValue& Value)
 {
+	UE_LOG(LogTemp, Warning, TEXT("=== 마우스클릭 함수 시작 ==="));
 	SpawnWaterBall();
 }
 
-void APlayer_WuYang::MouseLBTrigger()
+void APlayer_WuYang::MouseLBTrigger(const FInputActionValue& Value)
 {
 	
 }
 
-void APlayer_WuYang::MouseLBComplete()
+void APlayer_WuYang::MouseLBComplete(const FInputActionValue& Value)
 {
-	
+	// 1. Is Valid 체크 (이미지의 ? Is Valid 노드)
+	if (CurrentWaterBall && CurrentWaterBall->IsValidLowLevel())
+	{
+		// 2. Move Control 컴포넌트 찾기 (이미지의 Get Move Control 노드)
+		// 보통 MoveControl은 ProjectileMovementComponent일 확률이 높습니다.
+		UProjectileMovementComponent* MoveComp = CurrentWaterBall->FindComponentByClass<UProjectileMovementComponent>();
+
+		if (MoveComp)
+		{
+			// 3. Gravity Scale 설정 (이미지의 SET Projectile Gravity Scale 노드)
+			MoveComp->ProjectileGravityScale = 1.0f; // 1.0으로 설정해서 중력 적용
+            
+			UE_LOG(LogTemp, Warning, TEXT("워터볼 중력 적용 완료!"));
+		}
+	}
+    
+	// 사용이 끝났으면 변수 초기화 (선택 사항)
+	CurrentWaterBall = nullptr;
 }
 
 void APlayer_WuYang::SpawnWaterBall()
@@ -63,23 +81,18 @@ void APlayer_WuYang::SpawnWaterBall()
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		
 		// 1. 워터볼 소환
-		AActor* SpawnedActor = World->SpawnActor<AActor>(WaterBallClass, SpawnTransform, SpawnParams);
+		CurrentWaterBall = World->SpawnActor<AActor>(WaterBallClass, SpawnTransform, SpawnParams);
 
-		if (SpawnedActor)
+		if (CurrentWaterBall)
 		{
 			// 2. 워터볼 내부에서 ProjectileMovementComponent(MoveControl)를 찾습니다.
 			// 클래스 이름이 'MoveControl'로 되어 있어도 기본 타입이나 부모 타입을 넣으면 찾아집니다.
-			UProjectileMovementComponent* MoveComp = SpawnedActor->FindComponentByClass<UProjectileMovementComponent>();
+			UProjectileMovementComponent* MoveComp = CurrentWaterBall->FindComponentByClass<UProjectileMovementComponent>();
 
 			if (MoveComp)
 			{
 				// 3. 중력 스케일을 0으로 설정 (둥둥 떠다니게 함)
 				MoveComp->ProjectileGravityScale = 0.0f;
-                
-				// 만약 속도가 멈춰있다면 강제로 발사 방향으로 속도를 줄 수도 있습니다.
-				// MoveComp->Velocity = SpawnTransform.GetRotation().GetForwardVector() * MoveComp->InitialSpeed;
-                
-				UE_LOG(LogTemp, Warning, TEXT("WaterBall Gravity Scale set to 0!"));
 			}
 		}
 	}

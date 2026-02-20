@@ -27,19 +27,22 @@ protected:
 	
 	/** Called from Input Actions for attack input */
 	UFUNCTION(BlueprintCallable, Category="Input")
-	void MouseLBStart();
+	void MouseLBStart(const FInputActionValue& Value);
 	/** Called from Input Actions for attack input */
 	UFUNCTION(BlueprintCallable, Category="Input")
-	void MouseLBTrigger();
+	void MouseLBTrigger(const FInputActionValue& Value);
 	/** Called from Input Actions for attack input */
 	UFUNCTION(BlueprintCallable, Category="Input")
-	void MouseLBComplete();
+	void MouseLBComplete(const FInputActionValue& Value);
 	
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
 	TSubclassOf<class AActor> WaterBallClass;
+	
+	UPROPERTY()
+	AActor* CurrentWaterBall;
 	
 	void SpawnWaterBall();
 	
