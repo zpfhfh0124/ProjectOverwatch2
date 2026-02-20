@@ -39,6 +39,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Shuriken")
 	float SpinSpeed = 2000.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Shuriken")
+	FName AttachedSocketName = "";
 
 	UFUNCTION(BlueprintCallable, Category = "Shuriken")
 	// 투척 (방향 및 속도 세팅)
@@ -46,6 +49,10 @@ public:
 
 	// 회전
 	void RotateInDirection(const FRotator& Rot);
+	
+	UFUNCTION(BlueprintCallable, Category = "Shuriken")
+	// 장착된 소켓 네임 설정
+	void SetSocketName(const FName& SocketName);
 	
 protected:
 	// Called when the game starts or when spawned

@@ -3,7 +3,6 @@
 
 #include "Shuriken.h"
 
-#include "PlayerBase.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
@@ -12,7 +11,7 @@
 AShuriken::AShuriken()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	// Collision 초기 설정 (장착중에는 콜리전 off)
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
@@ -61,7 +60,7 @@ void AShuriken::FireInDirection(const FVector& ShootDir)
 	// 투사체 설정
 	ProjectileMovement->StopMovementImmediately();
 	ProjectileMovement->SetUpdatedComponent(Collision);
-	ProjectileMovement->ProjectileGravityScale = 0.2f;
+	//ProjectileMovement->ProjectileGravityScale = 0.2f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->Velocity = ShootDir.GetSafeNormal() * ProjectileMovement->InitialSpeed;
 	ProjectileMovement->Activate(true);
@@ -73,6 +72,11 @@ void AShuriken::FireInDirection(const FVector& ShootDir)
 void AShuriken::RotateInDirection(const FRotator& Rot)
 {
 	SkMesh->AddLocalRotation(Rot);
+}
+
+void AShuriken::SetSocketName(const FName& SocketName)
+{
+	AttachedSocketName = SocketName;
 }
 
 void AShuriken::OnHit(UPrimitiveComponent* HitComp,
@@ -113,8 +117,11 @@ void AShuriken::Tick(float DeltaTime)
 
 	if (IsFiring)
 	{
-		// 회전
-		RotateInDirection(FRotator(0.f, SpinSpeed * DeltaTime, 0.f));
+		// 회전 YZX 
+		RotateInDirection(FRotator(SpinSpeed * DeltaTime, 0.f, 0.f));
+		FString name = GetActorNameOrLabel();
+		FVector vector = GetActorLocation();
+		UE_LOG(LogTemp, Warning, TEXT("%s Location : (%.2f, %.2f, %.2f)"), *name, vector.X, vector.Y, vector.Z);
 	}
 }
 

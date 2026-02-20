@@ -89,9 +89,14 @@ void APlayerBase::SetPerspectiveMode(EPerspectiveMode NewMode)
 	ApplyPerspectiveVisibility();
 }
 
-FVector APlayerBase::GetAimCrosshair() const
+FVector APlayerBase::GetForwardDir() const
 {
-	APlayerController* PC = Cast<APlayerController>(GetController());
+	// 카메라 기준으로 계산
+	auto vector = FPCamera->GetForwardVector();
+	float distance = 300.f;
+	return vector * distance;
+	
+	/*APlayerController* PC = Cast<APlayerController>(GetController());
 	if (!PC) return GetActorForwardVector();
 
 	int32 SizeX, SizeY;
@@ -108,7 +113,7 @@ FVector APlayerBase::GetAimCrosshair() const
 	GetWorld()->LineTraceSingleByChannel(Hit, WorldOrigin, End, ECC_Visibility);
 
 	FVector TargetPoint = Hit.bBlockingHit ? Hit.ImpactPoint : End;
-	return TargetPoint;
+	return TargetPoint;*/
 }
 
 void APlayerBase::ApplyPerspectiveVisibility()
