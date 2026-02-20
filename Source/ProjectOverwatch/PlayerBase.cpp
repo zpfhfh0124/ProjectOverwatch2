@@ -21,8 +21,9 @@ APlayerBase::APlayerBase()
 	FPCamera->SetupAttachment(SpringArm);
 }
 
-void APlayerBase::TogglePerspective(const FInputActionValue& value)
+void APlayerBase::TogglePerspective_Implementation()
 {
+	UE_LOG(LogTemp, Warning, TEXT("TogglePerspective_Implementation"));
 	if (PerspectiveMode == EPerspectiveMode::FirstPerson) SetPerspectiveMode(EPerspectiveMode::ThirdPerson);
 	else SetPerspectiveMode(EPerspectiveMode::FirstPerson);
 }
@@ -78,6 +79,12 @@ void APlayerBase::OnShift_Implementation()
 {
 }
 
+void APlayerBase::OnB()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnB"));
+	TogglePerspective();
+}
+
 void APlayerBase::SetPerspectiveMode(EPerspectiveMode NewMode)
 {
 	if ( PerspectiveMode == NewMode ) return;
@@ -85,8 +92,6 @@ void APlayerBase::SetPerspectiveMode(EPerspectiveMode NewMode)
 	
 	float armLength = PerspectiveMode == EPerspectiveMode::FirstPerson ? 0.0f : THIRD_PERSON_ARM_LENGTH;
 	SpringArm->TargetArmLength = armLength;
-	
-	ApplyPerspectiveVisibility();
 }
 
 FVector APlayerBase::GetForwardDir() const
@@ -95,46 +100,12 @@ FVector APlayerBase::GetForwardDir() const
 	auto vector = FPCamera->GetForwardVector();
 	float distance = 300.f;
 	return vector * distance;
-	
-	/*APlayerController* PC = Cast<APlayerController>(GetController());
-	if (!PC) return GetActorForwardVector();
-
-	int32 SizeX, SizeY;
-	PC->GetViewportSize(SizeX, SizeY);
-
-	FVector WorldOrigin;
-	FVector WorldDirection;
-
-	PC->DeprojectScreenPositionToWorld(SizeX * 0.5f, SizeY * 0.5f, WorldOrigin, WorldDirection);
-
-	FVector End = WorldOrigin + WorldDirection * 100000.f;
-
-	FHitResult Hit;
-	GetWorld()->LineTraceSingleByChannel(Hit, WorldOrigin, End, ECC_Visibility);
-
-	FVector TargetPoint = Hit.bBlockingHit ? Hit.ImpactPoint : End;
-	return TargetPoint;*/
-}
-
-void APlayerBase::ApplyPerspectiveVisibility()
-{
-	// FP : 손, 팔만 보이도록 몸은 숨김
-	if (PerspectiveMode == EPerspectiveMode::FirstPerson)
-	{
-		//GetMesh()->SetOwnerNoSee(true);
-	}
-	// TP : 전신 보이도록 설정
-	else
-	{
-		GetMesh()->SetOwnerNoSee(false);
-	}
 }
 
 // Called when the game starts or when spawned
 void APlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
-	ApplyPerspectiveVisibility();
 	
 	// Input Mapping
 	APlayerController* PC = Cast<APlayerController>(Controller);
@@ -181,6 +152,7 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EIC->BindAction(IA_E, ETriggerEvent::Started, this, &APlayerBase::OnE);
 	EIC->BindAction(IA_F, ETriggerEvent::Started, this, &APlayerBase::OnF);
 	EIC->BindAction(IA_R, ETriggerEvent::Started, this, &APlayerBase::OnR);
+	EIC->BindAction(IA_B, ETriggerEvent::Started, this, &APlayerBase::OnB);
 	EIC->BindAction(IA_Shift, ETriggerEvent::Started, this, &APlayerBase::OnShift);
 }
 
