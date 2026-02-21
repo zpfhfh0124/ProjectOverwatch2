@@ -38,6 +38,8 @@ public:
 	// Camera
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
 	EPerspectiveMode PerspectiveMode = EPerspectiveMode::FirstPerson;
+
+	bool IsChangeArmLength = false;
 	
 	// Mesh
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")

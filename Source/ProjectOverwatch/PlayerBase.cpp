@@ -82,6 +82,11 @@ void APlayerBase::OnShift_Implementation()
 void APlayerBase::OnB()
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnB"));
+	if (IsChangeArmLength)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IsChangeArmLength : True"));
+		return;
+	}
 	TogglePerspective();
 }
 
@@ -89,9 +94,8 @@ void APlayerBase::SetPerspectiveMode(EPerspectiveMode NewMode)
 {
 	if ( PerspectiveMode == NewMode ) return;
 	PerspectiveMode = NewMode;
-	
-	float armLength = PerspectiveMode == EPerspectiveMode::FirstPerson ? 0.0f : THIRD_PERSON_ARM_LENGTH;
-	SpringArm->TargetArmLength = armLength;
+
+	IsChangeArmLength = true;
 }
 
 FVector APlayerBase::GetForwardDir() const
@@ -127,6 +131,23 @@ void APlayerBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// FPS - TPS 간 전환 시 카메라 이동 처리
+	if (IsChangeArmLength)
+	{
+		float armLength = PerspectiveMode == EPerspectiveMode::FirstPerson ? 0.0f : THIRD_PERSON_ARM_LENGTH;
+		float speed = SpringArm->TargetArmLength >= armLength ? 0 : 1000.0f;
+
+		if (speed > 0.f)
+		{
+			SpringArm->TargetArmLength += DeltaTime * speed;
+			if (SpringArm->TargetArmLength >= armLength) IsChangeArmLength = false;
+		}
+		else
+		{
+			SpringArm->TargetArmLength = armLength;
+			IsChangeArmLength = false;
+		}
+	}
 }
 
 // Called to bind functionality to input
