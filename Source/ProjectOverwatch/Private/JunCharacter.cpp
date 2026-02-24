@@ -10,6 +10,8 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+
+
 // Sets default values
 AJunCharacter::AJunCharacter()
 {
@@ -44,10 +46,11 @@ AJunCharacter::AJunCharacter()
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true; // 또는 bCanCrouch 설정
 	// GetCharacterMovement()->CrouchedHalfHeight = 60.f; // 필요하면
 	
-	auto* MoveComp = GetCharacterMovement();
+	MoveComp = GetCharacterMovement();
 	
 	MoveComp->bCanWalkOffLedges = true;
 	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
+	
 	
 }
 
@@ -95,6 +98,10 @@ void AJunCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		PlayerInput->BindAction(IA_JunJump, ETriggerEvent::Triggered, this, &AJunCharacter::jump);
 		PlayerInput->BindAction(IA_JunCrouch, ETriggerEvent::Started, this, &AJunCharacter::crouch);
 		PlayerInput->BindAction(IA_JunCrouch, ETriggerEvent::Completed, this, &AJunCharacter::stopcrouch);
+		PlayerInput->BindAction(IA_JunShift, ETriggerEvent::Started, this, &AJunCharacter::shift);
+		PlayerInput->BindAction(IA_JunShift, ETriggerEvent::Completed, this, &AJunCharacter::stopshift);
+		PlayerInput->BindAction(IA_JunLeft, ETriggerEvent::Triggered, this, &AJunCharacter::left);
+		PlayerInput->BindAction(IA_JunRight, ETriggerEvent::Started, this, &AJunCharacter::right);
 
 	}
 }
@@ -119,13 +126,43 @@ void AJunCharacter::stopcrouch(const struct FInputActionValue& inputValue)
 	UnCrouch();
 }
 
-void AJunCharacter::move(const struct FInputActionValue& inputValue)
+void AJunCharacter::move(const FInputActionValue& inputValue)
 {
-	FVector2D value = inputValue.Get<FVector2D>();
-	//상하 입력 이벤트 처리
-	direction.X = value.X;
-	//좌우 입력
-	direction.Y = value.Y;
+	if (!MoveComp) MoveComp = GetCharacterMovement();
+	if (!MoveComp) return;
+
+	const FVector2D Axis = inputValue.Get<FVector2D>();
+
+	float Forward = Axis.X; // ✅ 전후
+	float Right   = Axis.Y; // ✅ 좌우
+
+	// 솔져 스프린트 조건: Shift + 전진(Forward > 0)
+	const bool bShiftingNow = bIsShifting && (Forward > 0.f);
+
+	// Shift 누른 동안엔 후진(S) 금지 (원하면 "걷기 후진"으로 바꿀 수도 있음)
+	if (bIsShifting)
+	{
+		Forward = FMath::Max(Forward, 0.f);
+	}
+1
+	// 속도 적용
+	MoveComp->MaxWalkSpeed = bShiftingNow ? 1200.f : 600.f;
+
+	// 대각선 속도 이득 방지
+	FVector2D Clamped(Forward, Right);          // (X=Right, Y=Forward) 형태로 클램프하면 편함
+	Clamped = Clamped.GetClampedToMaxSize(1.f);
+	Forward   = Clamped.X;
+	Right = Clamped.Y;
+
+	// 카메라(컨트롤러) yaw 기준 이동
+	const float Yaw = Controller ? Controller->GetControlRotation().Yaw : GetActorRotation().Yaw;
+	const FRotator YawRot(0.f, Yaw, 0.f);
+
+	const FVector ForwardDir = FRotationMatrix(YawRot).GetUnitAxis(EAxis::X);
+	const FVector RightDir   = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y);
+
+	AddMovementInput(ForwardDir, Forward);
+	AddMovementInput(RightDir,   Right);
 }
 
 void AJunCharacter::look(const FInputActionValue& inputValue)
@@ -147,4 +184,27 @@ void AJunCharacter::PlayerMove()
 	SetActorLocation(P);*/
 	AddMovementInput(direction);
 	direction = FVector::ZeroVector;
+}
+
+
+
+void AJunCharacter::left(const struct FInputActionValue& inputValue)
+{
+	
+}
+
+void AJunCharacter::right(const struct FInputActionValue& inputValue)
+{
+	
+}
+
+void AJunCharacter::shift(const struct FInputActionValue& inputValue)
+{
+	bIsShifting = true;
+}
+
+void AJunCharacter::stopshift(const struct FInputActionValue& inputValue)
+{
+	bIsShifting = false;
+	MoveComp->MaxWalkSpeed = 600.f;
 }

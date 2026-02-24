@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "JunCharacter.generated.h"
 
+
 struct FInputActionValue;
 
 UCLASS()
@@ -33,6 +34,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category=Camera) class UCameraComponent* FPSCamComp;
 	
 public:
+	bool bIsShifting = false;
+
+	
+public:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	class UInputMappingContext* IMC_Jun;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -45,7 +50,6 @@ public:
 	class UInputAction* IA_JunMove;
 	//이동 속도
 	UPROPERTY(EditDefaultsOnly, Category=PlayerSetting)
-	float walkSpeed = 600;
 	//이동 방향
 	FVector direction;
 	
@@ -60,11 +64,27 @@ public:
 	class UInputAction* IA_JunCrouch;
 	//앉기 입력 이벤트 처리 함수
 	void crouch(const struct FInputActionValue& inputValue);
-	
 	//앉기 끝
 	void stopcrouch(const struct FInputActionValue& inputValue);
 	
-	//플레이어 이동처리
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	class UInputAction* IA_JunShift;
+	void shift(const struct FInputActionValue& inputValue);
+	void stopshift(const struct FInputActionValue& inputValue);
+	
 	void PlayerMove();
+	
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	class UInputAction* IA_JunLeft;
+	void left(const struct FInputActionValue& inputValue);
+
+	
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	class UInputAction* IA_JunRight;
+	void right(const struct FInputActionValue& inputValue);
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	class UCharacterMovementComponent* MoveComp;
+	
 	
 };
