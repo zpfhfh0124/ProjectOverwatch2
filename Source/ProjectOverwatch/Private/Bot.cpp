@@ -4,6 +4,7 @@
 #include "Bot.h"
 
 #include "Bullet.h"
+#include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 
 class ABullet;
@@ -30,8 +31,10 @@ ABot::ABot()
 		StaticMeshComponent->SetMaterial(0, tempMat.Object);
 	}
 	
-	FirePoint = CreateDefaultSubobject<USceneComponent>(FName("FirePoint"));
-	FirePoint->SetupAttachment(RootComponent);
+	FirePointA = CreateDefaultSubobject<UArrowComponent>(FName("FirePointA"));
+	FirePointA->SetupAttachment(RootComponent);
+	FirePointB = CreateDefaultSubobject<UArrowComponent>(FName("FirePointB"));
+	FirePointB->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -57,6 +60,7 @@ void ABot::Tick(float DeltaTime)
 void ABot::FireBulletForward()
 {
 	// Bullet 생성
-	GetWorld()->SpawnActor<ABullet>(BulletFactory, FirePoint->GetComponentTransform());
+	GetWorld()->SpawnActor<ABullet>(BulletFactory, FirePointA->GetComponentTransform());
+	GetWorld()->SpawnActor<ABullet>(BulletFactory, FirePointB->GetComponentTransform());
 }
 

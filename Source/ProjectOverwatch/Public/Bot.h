@@ -33,14 +33,16 @@ public:
 	
 	// 투사체 스폰 위치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "컴포넌트")
-	TObjectPtr<class USceneComponent> FirePoint;
+	TObjectPtr<class UArrowComponent> FirePointA;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "컴포넌트")
+	TObjectPtr<class UArrowComponent> FirePointB;
 	
 	// 투사체 생성
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ABullet> BulletFactory;
 	
 	// 투사 시간
-	float FireDelayTime = 5.f;
+	float FireDelayTime = 1.f;
 	float CurrFireTime = 0.f;
 	
 	// 투사체 발사
