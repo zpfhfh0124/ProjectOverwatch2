@@ -35,4 +35,6 @@ public:
 	class UStaticMeshComponent* bodyMeshComp;
 	
 	
+	FVector Direction;
+	
 };

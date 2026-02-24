@@ -8,11 +8,12 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "JunRocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
 
-// Sets default values
+// Sets default values   
 AJunCharacter::AJunCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -39,9 +40,15 @@ AJunCharacter::AJunCharacter()
 	FPSCamComp->SetupAttachment(SpringArmComponent);
 	FPSCamComp->bUsePawnControlRotation = false;
 	
+	//카메라 마우스방향 조절?
 	bUseControllerRotationYaw = true;
 	//2단 점프
 	JumpMaxCount = 2;
+	
+	//중력계쑤
+	
+	FirePoint = CreateDefaultSubobject<USceneComponent>("FirePoint");
+	FirePoint->SetupAttachment(RootComponent);
 	
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true; // 또는 bCanCrouch 설정
 	// GetCharacterMovement()->CrouchedHalfHeight = 60.f; // 필요하면
@@ -68,7 +75,14 @@ void AJunCharacter::BeginPlay()
 		{
 			subsystem->AddMappingContext(IMC_Jun, 0);
 		}
+		APlayerCameraManager* CameraManager = GetLocalViewingPlayerController()->PlayerCameraManager;
+		if (CameraManager)
+		{
+			CameraManager->ViewPitchMax = 70.0f;
+			CameraManager->ViewPitchMin = -70.f;
+		}
 	}
+	
 }
 
 // Called every frame
@@ -133,28 +147,22 @@ void AJunCharacter::move(const FInputActionValue& inputValue)
 
 	const FVector2D Axis = inputValue.Get<FVector2D>();
 
-	float Forward = Axis.X; // ✅ 전후
-	float Right   = Axis.Y; // ✅ 좌우
+	float Forward = Axis.X; // 전후 (W+, S-)
+	float Right   = Axis.Y; // 좌우 (D+, A-)
 
-	// 솔져 스프린트 조건: Shift + 전진(Forward > 0)
-	const bool bShiftingNow = bIsShifting && (Forward > 0.f);
+	// 스프린트는 "Shift를 누르고 + 전진(Forward > 0)"일 때만
+	const bool bSprintNow = bIsShifting && (Forward > 0.f);
 
-	// Shift 누른 동안엔 후진(S) 금지 (원하면 "걷기 후진"으로 바꿀 수도 있음)
-	if (bIsShifting)
-	{
-		Forward = FMath::Max(Forward, 0.f);
-	}
-1
-	// 속도 적용
-	MoveComp->MaxWalkSpeed = bShiftingNow ? 1200.f : 600.f;
+	// 속도만 분기 (S는 걷기로 자연스럽게 후진)
+	MoveComp->MaxWalkSpeed = bSprintNow ? 1200.f : 600.f;
 
-	// 대각선 속도 이득 방지
-	FVector2D Clamped(Forward, Right);          // (X=Right, Y=Forward) 형태로 클램프하면 편함
+	// 대각선 속도 이득 방지 (Forward/Right 그대로 클램프)
+	FVector2D Clamped(Forward, Right);
 	Clamped = Clamped.GetClampedToMaxSize(1.f);
-	Forward   = Clamped.X;
-	Right = Clamped.Y;
+	Forward = Clamped.X;
+	Right   = Clamped.Y;
 
-	// 카메라(컨트롤러) yaw 기준 이동
+	// 컨트롤러 Yaw 기준 이동
 	const float Yaw = Controller ? Controller->GetControlRotation().Yaw : GetActorRotation().Yaw;
 	const FRotator YawRot(0.f, Yaw, 0.f);
 
@@ -190,12 +198,40 @@ void AJunCharacter::PlayerMove()
 
 void AJunCharacter::left(const struct FInputActionValue& inputValue)
 {
-	
+	if (!FPSCamComp) return;
+
+	const FVector Start = FPSCamComp->GetComponentLocation();
+	const FVector End   = Start + (FPSCamComp->GetForwardVector() * 30000.f);
+
+	FHitResult Hit;
+
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(LeftTrace), true);
+	Params.AddIgnoredActor(this);     // Ignore Self
+	// Params.bTraceComplex = false;  // BP에서 Trace Complex 꺼져있으니 기본 false
+
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(
+		Hit,
+		Start,
+		End,
+		ECC_Visibility,
+		Params
+	);
+
+	// Draw Debug Type: For Duration 느낌
+	const float Duration = 1.0f; // 원하는 시간으로 조절
+	DrawDebugLine(GetWorld(), Start, bHit ? Hit.ImpactPoint : End, FColor::Green, false, Duration, 0, 1.5f);
+
+	if (bHit)
+	{
+		DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 8.f, FColor::Red, false, Duration);
+		// 여기서 Hit.GetActor(), Hit.BoneName 등으로 데미지/이펙트 처리 가능
+	}
 }
 
 void AJunCharacter::right(const struct FInputActionValue& inputValue)
 {
-	
+	FTransform t = FirePoint->GetComponentTransform();
+	GetWorld()->SpawnActor<AJunRocket>(RocketFactory, t);
 }
 
 void AJunCharacter::shift(const struct FInputActionValue& inputValue)

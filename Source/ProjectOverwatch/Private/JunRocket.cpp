@@ -42,5 +42,11 @@ void AJunRocket::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// P = P0 + velocity(direction * speed) * t
+	Direction = GetActorForwardVector();
+	FVector P0 = GetActorLocation();
+	FVector velocity = Direction * movementComp->MaxSpeed;
+	SetActorLocation(P0 + velocity * DeltaTime);
+	
 }
 

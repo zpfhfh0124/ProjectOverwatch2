@@ -30,12 +30,22 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
-	UPROPERTY(VisibleAnywhere, Category=Camera) class USpringArmComponent* SpringArmComponent;
-	UPROPERTY(VisibleAnywhere, Category=Camera) class UCameraComponent* FPSCamComp;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="camera") 
+	class USpringArmComponent* SpringArmComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="camera") 
+	class UCameraComponent* FPSCamComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AJunRocket> RocketFactory;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USceneComponent* FirePoint;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Weapon")
+	TEnumAsByte<ECollisionChannel> AimTraceChannel = ECC_Visibility;
+
 public:
 	bool bIsShifting = false;
-
 	
 public:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -79,12 +89,16 @@ public:
 	void left(const struct FInputActionValue& inputValue);
 
 	
+
+	
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	class UInputAction* IA_JunRight;
 	void right(const struct FInputActionValue& inputValue);
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	class UCharacterMovementComponent* MoveComp;
+	
+	
 	
 	
 };
