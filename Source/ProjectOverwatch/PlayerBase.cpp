@@ -5,7 +5,6 @@
 #include "PlayerBase.h"
 
 #include "InputMappingContext.h"
-#include "InputState.h"
 
 // Sets default values
 APlayerBase::APlayerBase()
@@ -124,6 +123,9 @@ void APlayerBase::BeginPlay()
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
+	
+	// 최대 2단 점프까지 가능하도록 설정
+	this->JumpMaxCount = 2;
 }
 
 // Called every frame

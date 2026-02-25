@@ -93,7 +93,6 @@ public:
 	void OnR();			// R 키 입력
 	UFUNCTION(Category="Input")
 	void OnB();			// B 키 입력
-	
 	UFUNCTION(BlueprintNativeEvent, Category="Input")
 	void OnShift();		// 쉬프트 키 스킬
 
@@ -104,8 +103,6 @@ public:
 	EPerspectiveMode GetPerspectiveMode() const { return PerspectiveMode; }
 	UFUNCTION(BlueprintCallable, Category="Combat")
 	FVector GetForwardDir() const;
-	
-private:
 	
 protected:
 	// Called when the game starts or when spawned
