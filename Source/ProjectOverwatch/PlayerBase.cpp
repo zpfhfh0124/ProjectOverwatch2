@@ -5,7 +5,6 @@
 #include "PlayerBase.h"
 
 #include "InputMappingContext.h"
-#include "InputState.h"
 
 // Sets default values
 APlayerBase::APlayerBase()
@@ -21,8 +20,9 @@ APlayerBase::APlayerBase()
 	FPCamera->SetupAttachment(SpringArm);
 }
 
-void APlayerBase::TogglePerspective(const FInputActionValue& value)
+void APlayerBase::TogglePerspective_Implementation()
 {
+	UE_LOG(LogTemp, Warning, TEXT("TogglePerspective_Implementation"));
 	if (PerspectiveMode == EPerspectiveMode::FirstPerson) SetPerspectiveMode(EPerspectiveMode::ThirdPerson);
 	else SetPerspectiveMode(EPerspectiveMode::FirstPerson);
 }
@@ -78,58 +78,37 @@ void APlayerBase::OnShift_Implementation()
 {
 }
 
+void APlayerBase::OnB()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnB"));
+	if (IsChangeArmLength)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IsChangeArmLength : True"));
+		return;
+	}
+	TogglePerspective();
+}
+
 void APlayerBase::SetPerspectiveMode(EPerspectiveMode NewMode)
 {
 	if ( PerspectiveMode == NewMode ) return;
 	PerspectiveMode = NewMode;
-	
-	float armLength = PerspectiveMode == EPerspectiveMode::FirstPerson ? 0.0f : THIRD_PERSON_ARM_LENGTH;
-	SpringArm->TargetArmLength = armLength;
-	
-	ApplyPerspectiveVisibility();
+
+	IsChangeArmLength = true;
 }
 
-FVector APlayerBase::GetAimCrosshair() const
+FVector APlayerBase::GetForwardDir() const
 {
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (!PC) return GetActorForwardVector();
-
-	int32 SizeX, SizeY;
-	PC->GetViewportSize(SizeX, SizeY);
-
-	FVector WorldOrigin;
-	FVector WorldDirection;
-
-	PC->DeprojectScreenPositionToWorld(SizeX * 0.5f, SizeY * 0.5f, WorldOrigin, WorldDirection);
-
-	FVector End = WorldOrigin + WorldDirection * 100000.f;
-
-	FHitResult Hit;
-	GetWorld()->LineTraceSingleByChannel(Hit, WorldOrigin, End, ECC_Visibility);
-
-	FVector TargetPoint = Hit.bBlockingHit ? Hit.ImpactPoint : End;
-	return TargetPoint;
-}
-
-void APlayerBase::ApplyPerspectiveVisibility()
-{
-	// FP : 손, 팔만 보이도록 몸은 숨김
-	if (PerspectiveMode == EPerspectiveMode::FirstPerson)
-	{
-		//GetMesh()->SetOwnerNoSee(true);
-	}
-	// TP : 전신 보이도록 설정
-	else
-	{
-		GetMesh()->SetOwnerNoSee(false);
-	}
+	// 카메라 기준으로 계산
+	auto vector = FPCamera->GetForwardVector();
+	float distance = 300.f;
+	return vector * distance;
 }
 
 // Called when the game starts or when spawned
 void APlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
-	ApplyPerspectiveVisibility();
 	
 	// Input Mapping
 	APlayerController* PC = Cast<APlayerController>(Controller);
@@ -144,6 +123,9 @@ void APlayerBase::BeginPlay()
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
+	
+	// 최대 2단 점프까지 가능하도록 설정
+	this->JumpMaxCount = 2;
 }
 
 // Called every frame
@@ -151,6 +133,23 @@ void APlayerBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// FPS - TPS 간 전환 시 카메라 이동 처리
+	if (IsChangeArmLength)
+	{
+		float armLength = PerspectiveMode == EPerspectiveMode::FirstPerson ? 0.0f : THIRD_PERSON_ARM_LENGTH;
+		float speed = SpringArm->TargetArmLength >= armLength ? 0 : 1000.0f;
+
+		if (speed > 0.f)
+		{
+			SpringArm->TargetArmLength += DeltaTime * speed;
+			if (SpringArm->TargetArmLength >= armLength) IsChangeArmLength = false;
+		}
+		else
+		{
+			SpringArm->TargetArmLength = armLength;
+			IsChangeArmLength = false;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -176,6 +175,7 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EIC->BindAction(IA_E, ETriggerEvent::Started, this, &APlayerBase::OnE);
 	EIC->BindAction(IA_F, ETriggerEvent::Started, this, &APlayerBase::OnF);
 	EIC->BindAction(IA_R, ETriggerEvent::Started, this, &APlayerBase::OnR);
+	EIC->BindAction(IA_B, ETriggerEvent::Started, this, &APlayerBase::OnB);
 	EIC->BindAction(IA_Shift, ETriggerEvent::Started, this, &APlayerBase::OnShift);
 }
 

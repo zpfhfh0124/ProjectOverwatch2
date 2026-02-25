@@ -38,14 +38,16 @@ public:
 	// Camera
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
 	EPerspectiveMode PerspectiveMode = EPerspectiveMode::FirstPerson;
+
+	bool IsChangeArmLength = false;
 	
 	// Mesh
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
 	USkeletalMeshComponent* SkeletalMesh;
 	
 	// 카메라 시점 변환용 (토글)
-	UFUNCTION(BlueprintCallable, Category="Input")
-	void TogglePerspective(const FInputActionValue& value);			
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
+	void TogglePerspective();			
 	
 	// Input Assets
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
@@ -69,6 +71,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_R;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_B;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_Shift;
 	
 	// 플레이어 기본 Movement
@@ -87,6 +91,8 @@ public:
 	void OnF();			// F 키 입력
 	UFUNCTION(BlueprintNativeEvent, Category="Input")
 	void OnR();			// R 키 입력
+	UFUNCTION(Category="Input")
+	void OnB();			// B 키 입력
 	UFUNCTION(BlueprintNativeEvent, Category="Input")
 	void OnShift();		// 쉬프트 키 스킬
 
@@ -96,10 +102,7 @@ public:
 	UFUNCTION(BlueprintPure, Category="Camera")
 	EPerspectiveMode GetPerspectiveMode() const { return PerspectiveMode; }
 	UFUNCTION(BlueprintCallable, Category="Combat")
-	FVector GetAimCrosshair() const;
-	
-private:
-	void ApplyPerspectiveVisibility();
+	FVector GetForwardDir() const;
 	
 protected:
 	// Called when the game starts or when spawned
