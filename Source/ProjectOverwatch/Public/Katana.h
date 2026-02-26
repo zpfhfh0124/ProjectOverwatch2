@@ -31,6 +31,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Component")
 	class UStaticMeshComponent* KatanaMeshComp;
 	
+	// 소유한 플레이어의 정보를 저장할 포인터
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class APlayerBase* OwnerPlayer;
+	
+	UFUNCTION(BlueprintCallable)
+	void SetOwnerPlayer(APlayerBase* Player);
+	
 	// 충돌 델리게이트
 	UFUNCTION()
 	void OnKatanaHit(
