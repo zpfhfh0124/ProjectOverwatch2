@@ -25,8 +25,8 @@ AJunRocket::AJunRocket()
 	movementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
 	movementComp->SetUpdatedComponent(collisionComp);
 	
-	movementComp->InitialSpeed = 5000;
-	movementComp->MaxSpeed = 5000;
+	movementComp->InitialSpeed = 2500;
+	movementComp->MaxSpeed = 2500;
 	
 }
 
@@ -35,6 +35,9 @@ void AJunRocket::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	collisionComp->OnComponentBeginOverlap.AddDynamic(this, &AJunRocket::OnMyCompBeginOverlab);
+	
+	SetLifeSpan(10.f);
 }
 
 // Called every frame
@@ -48,5 +51,15 @@ void AJunRocket::Tick(float DeltaTime)
 	FVector velocity = Direction * movementComp->MaxSpeed;
 	SetActorLocation(P0 + velocity * DeltaTime);
 	
+}
+
+void AJunRocket::OnMyCompBeginOverlab(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	this->Destroy();
+	if (this->Destroy())
+	{
+		
+	}
 }
 

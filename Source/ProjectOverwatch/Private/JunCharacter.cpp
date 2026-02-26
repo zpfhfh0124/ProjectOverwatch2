@@ -209,6 +209,7 @@ void AJunCharacter::left(const struct FInputActionValue& inputValue)
 	Params.AddIgnoredActor(this);     // Ignore Self
 	// Params.bTraceComplex = false;  // BP에서 Trace Complex 꺼져있으니 기본 false
 
+	
 	const bool bHit = GetWorld()->LineTraceSingleByChannel(
 		Hit,
 		Start,
@@ -228,11 +229,53 @@ void AJunCharacter::left(const struct FInputActionValue& inputValue)
 	}
 }
 
-void AJunCharacter::right(const struct FInputActionValue& inputValue)
+void AJunCharacter::right(const FInputActionValue& inputValue)
 {
-	FTransform t = FirePoint->GetComponentTransform();
-	GetWorld()->SpawnActor<AJunRocket>(RocketFactory, t);
+	if (!FirePoint || !RocketFactory) return;
+
+	FVector AimPoint, TraceEnd;
+	if (!GetAimPointFromCamera(AimPoint, TraceEnd)) return;
+
+	const FVector MuzzleLoc = FirePoint->GetComponentLocation();
+
+	// ✅ 총구(FirePoint) -> 조준점 방향으로 회전 계산
+	const FRotator SpawnRot = (AimPoint - MuzzleLoc).Rotation();
+
+	FActorSpawnParameters Params;
+	Params.Owner = this;
+	Params.Instigator = this;
+
+	// ✅ 위치는 FirePoint, 회전은 AimPoint 방향
+	GetWorld()->SpawnActor<AJunRocket>(RocketFactory, MuzzleLoc, SpawnRot, Params);
 }
+
+bool AJunCharacter::GetAimPointFromCamera(FVector& OutAimPoint, FVector& OutTraceEnd) const
+{
+	if (!FPSCamComp) return false;
+
+	const FVector Start = FPSCamComp->GetComponentLocation();
+	const FVector End   = Start + (FPSCamComp->GetForwardVector() * 30000.f);
+	OutTraceEnd = End;
+
+	FHitResult Hit;
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(CameraAimTrace), true);
+	Params.AddIgnoredActor(this);
+
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(
+		Hit,
+		Start,
+		End,
+		AimTraceChannel,   // ✅ 너가 만든 변수 사용
+		Params
+	);
+
+	OutAimPoint = bHit ? Hit.ImpactPoint : End;
+
+	return true;
+}
+
+
+
 
 void AJunCharacter::shift(const struct FInputActionValue& inputValue)
 {

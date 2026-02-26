@@ -98,7 +98,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	class UCharacterMovementComponent* MoveComp;
 	
-	
+private:
+	bool GetAimPointFromCamera(FVector& OutAimPoint, FVector& OutTraceEnd) const;
 	
 	
 };
