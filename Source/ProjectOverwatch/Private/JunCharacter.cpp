@@ -8,9 +8,12 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "JunRocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-// Sets default values
+
+
+// Sets default values   
 AJunCharacter::AJunCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -37,17 +40,24 @@ AJunCharacter::AJunCharacter()
 	FPSCamComp->SetupAttachment(SpringArmComponent);
 	FPSCamComp->bUsePawnControlRotation = false;
 	
+	//카메라 마우스방향 조절?
 	bUseControllerRotationYaw = true;
 	//2단 점프
 	JumpMaxCount = 2;
 	
+	//중력계쑤
+	
+	FirePoint = CreateDefaultSubobject<USceneComponent>("FirePoint");
+	FirePoint->SetupAttachment(RootComponent);
+	
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true; // 또는 bCanCrouch 설정
 	// GetCharacterMovement()->CrouchedHalfHeight = 60.f; // 필요하면
 	
-	auto* MoveComp = GetCharacterMovement();
+	MoveComp = GetCharacterMovement();
 	
 	MoveComp->bCanWalkOffLedges = true;
 	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
+	
 	
 }
 
@@ -65,7 +75,14 @@ void AJunCharacter::BeginPlay()
 		{
 			subsystem->AddMappingContext(IMC_Jun, 0);
 		}
+		APlayerCameraManager* CameraManager = GetLocalViewingPlayerController()->PlayerCameraManager;
+		if (CameraManager)
+		{
+			CameraManager->ViewPitchMax = 90.0f;
+			CameraManager->ViewPitchMin = -90.f;
+		}
 	}
+	
 }
 
 // Called every frame
@@ -95,6 +112,10 @@ void AJunCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		PlayerInput->BindAction(IA_JunJump, ETriggerEvent::Triggered, this, &AJunCharacter::jump);
 		PlayerInput->BindAction(IA_JunCrouch, ETriggerEvent::Started, this, &AJunCharacter::crouch);
 		PlayerInput->BindAction(IA_JunCrouch, ETriggerEvent::Completed, this, &AJunCharacter::stopcrouch);
+		PlayerInput->BindAction(IA_JunShift, ETriggerEvent::Started, this, &AJunCharacter::shift);
+		PlayerInput->BindAction(IA_JunShift, ETriggerEvent::Completed, this, &AJunCharacter::stopshift);
+		PlayerInput->BindAction(IA_JunLeft, ETriggerEvent::Triggered, this, &AJunCharacter::left);
+		PlayerInput->BindAction(IA_JunRight, ETriggerEvent::Started, this, &AJunCharacter::right);
 
 	}
 }
@@ -119,13 +140,37 @@ void AJunCharacter::stopcrouch(const struct FInputActionValue& inputValue)
 	UnCrouch();
 }
 
-void AJunCharacter::move(const struct FInputActionValue& inputValue)
+void AJunCharacter::move(const FInputActionValue& inputValue)
 {
-	FVector2D value = inputValue.Get<FVector2D>();
-	//상하 입력 이벤트 처리
-	direction.X = value.X;
-	//좌우 입력
-	direction.Y = value.Y;
+	if (!MoveComp) MoveComp = GetCharacterMovement();
+	if (!MoveComp) return;
+
+	const FVector2D Axis = inputValue.Get<FVector2D>();
+
+	float Forward = Axis.X; // 전후 (W+, S-)
+	float Right   = Axis.Y; // 좌우 (D+, A-)
+
+	// 스프린트는 "Shift를 누르고 + 전진(Forward > 0)"일 때만
+	const bool bSprintNow = bIsShifting && (Forward > 0.f);
+
+	// 속도만 분기 (S는 걷기로 자연스럽게 후진)
+	MoveComp->MaxWalkSpeed = bSprintNow ? 1200.f : 600.f;
+
+	// 대각선 속도 이득 방지 (Forward/Right 그대로 클램프)
+	FVector2D Clamped(Forward, Right);
+	Clamped = Clamped.GetClampedToMaxSize(1.f);
+	Forward = Clamped.X;
+	Right   = Clamped.Y;
+
+	// 컨트롤러 Yaw 기준 이동
+	const float Yaw = Controller ? Controller->GetControlRotation().Yaw : GetActorRotation().Yaw;
+	const FRotator YawRot(0.f, Yaw, 0.f);
+
+	const FVector ForwardDir = FRotationMatrix(YawRot).GetUnitAxis(EAxis::X);
+	const FVector RightDir   = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y);
+
+	AddMovementInput(ForwardDir, Forward);
+	AddMovementInput(RightDir,   Right);
 }
 
 void AJunCharacter::look(const FInputActionValue& inputValue)
@@ -147,4 +192,98 @@ void AJunCharacter::PlayerMove()
 	SetActorLocation(P);*/
 	AddMovementInput(direction);
 	direction = FVector::ZeroVector;
+}
+
+
+
+void AJunCharacter::left(const struct FInputActionValue& inputValue)
+{
+	if (!FPSCamComp) return;
+
+	const FVector Start = FPSCamComp->GetComponentLocation();
+	const FVector End   = Start + (FPSCamComp->GetForwardVector() * 30000.f);
+
+	FHitResult Hit;
+
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(LeftTrace), true);
+	Params.AddIgnoredActor(this);     // Ignore Self
+	// Params.bTraceComplex = false;  // BP에서 Trace Complex 꺼져있으니 기본 false
+
+	
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(
+		Hit,
+		Start,
+		End,
+		ECC_Visibility,
+		Params
+	);
+
+	// Draw Debug Type: For Duration 느낌
+	const float Duration = 1.0f; // 원하는 시간으로 조절
+	DrawDebugLine(GetWorld(), Start, bHit ? Hit.ImpactPoint : End, FColor::Green, false, Duration, 0, 1.5f);
+
+	if (bHit)
+	{
+		DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 8.f, FColor::Red, false, Duration);
+		// 여기서 Hit.GetActor(), Hit.BoneName 등으로 데미지/이펙트 처리 가능
+	}
+}
+
+void AJunCharacter::right(const FInputActionValue& inputValue)
+{
+	if (!FirePoint || !RocketFactory) return;
+
+	FVector AimPoint, TraceEnd;
+	if (!GetAimPointFromCamera(AimPoint, TraceEnd)) return;
+
+	const FVector MuzzleLoc = FirePoint->GetComponentLocation();
+
+	// ✅ 총구(FirePoint) -> 조준점 방향으로 회전 계산
+	const FRotator SpawnRot = (AimPoint - MuzzleLoc).Rotation();
+
+	FActorSpawnParameters Params;
+	Params.Owner = this;
+	Params.Instigator = this;
+
+	// ✅ 위치는 FirePoint, 회전은 AimPoint 방향
+	GetWorld()->SpawnActor<AJunRocket>(RocketFactory, MuzzleLoc, SpawnRot, Params);
+}
+
+bool AJunCharacter::GetAimPointFromCamera(FVector& OutAimPoint, FVector& OutTraceEnd) const
+{
+	if (!FPSCamComp) return false;
+
+	const FVector Start = FPSCamComp->GetComponentLocation();
+	const FVector End   = Start + (FPSCamComp->GetForwardVector() * 30000.f);
+	OutTraceEnd = End;
+
+	FHitResult Hit;
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(CameraAimTrace), true);
+	Params.AddIgnoredActor(this);
+
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(
+		Hit,
+		Start,
+		End,
+		AimTraceChannel,   // ✅ 너가 만든 변수 사용
+		Params
+	);
+
+	OutAimPoint = bHit ? Hit.ImpactPoint : End;
+
+	return true;
+}
+
+
+
+
+void AJunCharacter::shift(const struct FInputActionValue& inputValue)
+{
+	bIsShifting = true;
+}
+
+void AJunCharacter::stopshift(const struct FInputActionValue& inputValue)
+{
+	bIsShifting = false;
+	MoveComp->MaxWalkSpeed = 600.f;
 }
