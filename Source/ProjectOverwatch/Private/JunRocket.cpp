@@ -3,8 +3,17 @@
 
 #include "JunRocket.h"
 
+#include "Engine/World.h"
+#include "Engine/EngineTypes.h"
+
+#include "JunCharacter.h"
 #include "Components/SphereComponent.h"
+#include "Engine/OverlapResult.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+
+
+
+
 
 // Sets default values
 AJunRocket::AJunRocket()
@@ -12,8 +21,11 @@ AJunRocket::AJunRocket()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	
 	collisionComp = CreateDefaultSubobject<USphereComponent>("CollisionComp");
-	collisionComp->SetCollisionProfileName("OverlapAll");
+	collisionComp->SetGenerateOverlapEvents(true);
+	collisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly); // 또는 QueryAndPhysics
+	collisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic")); // OverlapAll 말고 이게 더 안전
 	collisionComp->SetSphereRadius(13);
 	SetRootComponent(collisionComp);
 	
@@ -25,8 +37,10 @@ AJunRocket::AJunRocket()
 	movementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
 	movementComp->SetUpdatedComponent(collisionComp);
 	
-	movementComp->InitialSpeed = 2500;
-	movementComp->MaxSpeed = 2500;
+	movementComp->ProjectileGravityScale = 0.f;
+	movementComp->InitialSpeed = 1500;
+	movementComp->MaxSpeed = 1500;
+	
 	
 }
 
@@ -53,13 +67,73 @@ void AJunRocket::Tick(float DeltaTime)
 	
 }
 
-void AJunRocket::OnMyCompBeginOverlab(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AJunRocket::OnMyCompBeginOverlab(
+    UPrimitiveComponent* OverlappedComponent,
+    AActor* OtherActor,
+    UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex,
+    bool bFromSweep,
+    const FHitResult& SweepResult)
 {
-	this->Destroy();
-	if (this->Destroy())
-	{
-		
-	}
-}
+    //  Destroy 먼저 하지 말고, 마지막에!
+    const FVector Center = GetActorLocation(); // 폭심지(간단히 로켓 위치)
 
+    const float Radius = 200.f;
+
+    FCollisionQueryParams Params(SCENE_QUERY_STAT(RocketExplosionOverlap), false);
+    Params.AddIgnoredActor(this);
+    if (AActor* OwnerActor = GetOwner()) Params.AddIgnoredActor(OwnerActor);
+
+    FCollisionObjectQueryParams ObjParams;
+    ObjParams.AddObjectTypesToQuery(ECC_Pawn); //  Pawn만 수집
+
+    TArray<FOverlapResult> Overlaps;
+    const bool bAny = GetWorld()->OverlapMultiByObjectType(
+        Overlaps,
+        Center,
+        FQuat::Identity,
+        ObjParams,
+        FCollisionShape::MakeSphere(Radius),
+        Params
+    );
+
+    if (bAny)
+    {
+        for (const FOverlapResult& O : Overlaps)
+        {
+            APawn* Pawn = Cast<APawn>(O.GetActor());
+            if (!Pawn) continue;
+
+            // 폭심지 -> 대상 방향
+            FVector Dir = (Pawn->GetActorLocation() - Center);
+            Dir.Z = 0.f; // 수평 넉백만
+            Dir = Dir.GetSafeNormal();
+
+            // 솔져 느낌 튕김 값(튜닝)
+            const float KnockbackSpeed = 1200.f;
+            const float UpBoost = 350.f;
+
+            //  Character면 LaunchCharacter 가능
+            if (ACharacter* Ch = Cast<ACharacter>(Pawn))
+            {
+                const FVector LaunchVel = Dir * KnockbackSpeed + FVector(0, 0, UpBoost);
+                Ch->LaunchCharacter(LaunchVel, true, true);
+            }
+            else
+            {
+                //  Character가 아닌 Pawn은 LaunchCharacter 불가
+                // (최소 대응) 루트가 물리 시뮬이면 임펄스로 밀기
+                if (UPrimitiveComponent* Prim = Cast<UPrimitiveComponent>(Pawn->GetRootComponent()))
+                {
+                    if (Prim->IsSimulatingPhysics())
+                    {
+                        const float ImpulseStrength = 2000.f;
+                        Prim->AddImpulse(Dir * ImpulseStrength, NAME_None, true);
+                    }
+                }
+            }
+        }
+    }
+
+    Destroy();
+}

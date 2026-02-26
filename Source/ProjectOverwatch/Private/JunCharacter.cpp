@@ -78,8 +78,8 @@ void AJunCharacter::BeginPlay()
 		APlayerCameraManager* CameraManager = GetLocalViewingPlayerController()->PlayerCameraManager;
 		if (CameraManager)
 		{
-			CameraManager->ViewPitchMax = 70.0f;
-			CameraManager->ViewPitchMin = -70.f;
+			CameraManager->ViewPitchMax = 90.0f;
+			CameraManager->ViewPitchMin = -90.f;
 		}
 	}
 	

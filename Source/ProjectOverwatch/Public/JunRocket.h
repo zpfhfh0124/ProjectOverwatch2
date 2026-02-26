@@ -34,6 +34,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = BodyMesh)
 	class UStaticMeshComponent* bodyMeshComp;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AJunRocketExplosion> ExplosionFactory;
+	
 	
 	FVector Direction;
 	
@@ -44,6 +47,8 @@ public:
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
+	
+
 	
 };
 
