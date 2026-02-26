@@ -63,6 +63,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	// 디버깅
+	UPROPERTY()
+	FVector PrevLocation;
+	
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp,
 		AActor* OtherActor,
