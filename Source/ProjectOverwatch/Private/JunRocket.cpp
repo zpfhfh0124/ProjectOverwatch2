@@ -38,8 +38,8 @@ AJunRocket::AJunRocket()
 	movementComp->SetUpdatedComponent(collisionComp);
 	
 	movementComp->ProjectileGravityScale = 0.f;
-	movementComp->InitialSpeed = 1500;
-	movementComp->MaxSpeed = 1500;
+	movementComp->InitialSpeed = 2000;
+	movementComp->MaxSpeed = 2000;
 	
 	
 }
@@ -48,10 +48,46 @@ AJunRocket::AJunRocket()
 void AJunRocket::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	collisionComp->OnComponentBeginOverlap.AddDynamic(this, &AJunRocket::OnMyCompBeginOverlab);
-	
+
+	if (collisionComp)
+	{
+		collisionComp->OnComponentBeginOverlap.AddDynamic(this, &AJunRocket::OnMyCompBeginOverlab);
+	}
+
 	SetLifeSpan(10.f);
+
+	//  발사 직후: Owner(발사자) 충돌/오버랩 완전 무시 시작
+	bIgnoreOwnerCollision = true;
+
+	if (AActor* OwnerActor = GetOwner())
+	{
+		if (collisionComp)
+		{
+			// 1) 이동(Sweep) 충돌에서 무시
+			collisionComp->IgnoreActorWhenMoving(OwnerActor, true);
+			collisionComp->MoveIgnoreActors.AddUnique(OwnerActor);
+
+			// 2) (선택) Instigator도 같이 무시하고 싶으면
+			// 보통 Owner=Instigator라 하나로 충분하지만 안전하게 같이 처리 가능
+			if (AActor* Inst = GetInstigator())
+			{
+				collisionComp->IgnoreActorWhenMoving(Inst, true);
+				collisionComp->MoveIgnoreActors.AddUnique(Inst);
+			}
+		}
+	}
+
+	//  일정 시간 뒤 무시 해제
+	if (IgnoreOwnerSeconds > 0.f)
+	{
+		GetWorldTimerManager().SetTimer(
+			IgnoreOwnerTimer,
+			this,
+			&AJunRocket::ClearIgnoreOwner,
+			IgnoreOwnerSeconds,
+			false
+		);
+	}
 }
 
 // Called every frame
@@ -75,17 +111,28 @@ void AJunRocket::OnMyCompBeginOverlab(
     bool bFromSweep,
     const FHitResult& SweepResult)
 {
-    //  Destroy 먼저 하지 말고, 마지막에!
+	//  발사 직후 일정 시간 동안은 "자기 자신"과의 오버랩은 무시
+	if (bIgnoreOwnerCollision)
+	{
+		if (OtherActor && (OtherActor == GetOwner() || OtherActor == GetInstigator()))
+		{
+			return;
+		}
+	}
+	
+	//  Destroy 먼저 하지 말고, 마지막에!
     const FVector Center = GetActorLocation(); // 폭심지(간단히 로켓 위치)
 
     const float Radius = 200.f;
 
-    FCollisionQueryParams Params(SCENE_QUERY_STAT(RocketExplosionOverlap), false);
+    // FCollisionQueryParams Params(SCENE_QUERY_STAT(RocketExplosionOverlap), false);
+    FCollisionQueryParams Params;
     Params.AddIgnoredActor(this);
-    if (AActor* OwnerActor = GetOwner()) Params.AddIgnoredActor(OwnerActor);
+    //if (AActor* OwnerActor = GetOwner()) Params.AddIgnoredActor(OwnerActor);
 
     FCollisionObjectQueryParams ObjParams;
     ObjParams.AddObjectTypesToQuery(ECC_Pawn); //  Pawn만 수집
+	
 
     TArray<FOverlapResult> Overlaps;
     const bool bAny = GetWorld()->OverlapMultiByObjectType(
@@ -136,4 +183,23 @@ void AJunRocket::OnMyCompBeginOverlab(
     }
 
     Destroy();
+}
+
+void AJunRocket::ClearIgnoreOwner()
+{
+	bIgnoreOwnerCollision = false;
+
+	if (!collisionComp) return;
+
+	if (AActor* OwnerActor = GetOwner())
+	{
+		collisionComp->IgnoreActorWhenMoving(OwnerActor, false);
+		collisionComp->MoveIgnoreActors.Remove(OwnerActor);
+	}
+
+	if (AActor* Inst = GetInstigator())
+	{
+		collisionComp->IgnoreActorWhenMoving(Inst, false);
+		collisionComp->MoveIgnoreActors.Remove(Inst);
+	}
 }
