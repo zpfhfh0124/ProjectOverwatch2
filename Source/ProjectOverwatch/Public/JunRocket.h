@@ -49,6 +49,17 @@ public:
 		const FHitResult& SweepResult);
 	
 
+	UPROPERTY(EditDefaultsOnly, Category="Collision")
+	float IgnoreOwnerSeconds = 0.10f;   //  0.08~0.15 추천 (움직일 때도 안정)
+
+	FTimerHandle IgnoreOwnerTimer;
+
+	UPROPERTY()
+	bool bIgnoreOwnerCollision = true;  //  지금 무시 중인지
+
+	UFUNCTION()
+	void ClearIgnoreOwner();
+	
 	
 };
 
