@@ -44,7 +44,8 @@ void AKatana::BeginPlay()
 void AKatana::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	// 디버그 라인
+	//DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation(), FColor::Magenta, false, 2.0f, 0, 2.0f);
 }
 
 void AKatana::SetOwnerPlayer(APlayerBase* Player)
@@ -65,6 +66,17 @@ void AKatana::OnKatanaHit(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 							  OwnerPlayer->GetForwardDir().GetSafeNormal() * otherPMComp->InitialSpeed : 
 							  otherPMComp->Velocity * -1; 
 		otherPMComp->SetVelocityInLocalSpace(newVelocity);
+
+		// Debug
+		DrawDebugSphere(
+			GetWorld(),
+			SweepResult.ImpactPoint,
+			10.f,
+			12,
+			FColor::Green,
+			false,
+			2.f
+);
 	}
 }
 
