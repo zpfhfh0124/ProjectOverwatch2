@@ -108,6 +108,8 @@ void AShuriken::BeginPlay()
 {
 	Super::BeginPlay();
 	IsFiring = false;
+
+	PrevLocation = GetActorLocation();
 }
 
 // Called every frame
@@ -122,6 +124,23 @@ void AShuriken::Tick(float DeltaTime)
 		FString name = GetActorNameOrLabel();
 		FVector vector = GetActorLocation();
 		//UE_LOG(LogTemp, Warning, TEXT("%s Location : (%.2f, %.2f, %.2f)"), *name, vector.X, vector.Y, vector.Z);
+
+		/// 디버깅 ------------
+		FVector Current = GetActorLocation();
+
+		DrawDebugLine(
+			GetWorld(),
+			PrevLocation,
+			Current,
+			FColor::Cyan,
+			false,
+			5.f,
+			0,
+			1.5f
+		);
+
+		PrevLocation = Current;
+		/// -------------------
 	}
 }
 
