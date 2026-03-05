@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+#pragma once
 
 #define THIRD_PERSON_ARM_LENGTH 300.0f
 
 #include "PlayerBase.h"
-
 #include "InputMappingContext.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -87,7 +87,11 @@ void APlayerBase::OnShift_Implementation()
 {
 }
 
-void APlayerBase::OnB()
+void APlayerBase::OnH_Implementation()
+{
+}
+
+void APlayerBase::OnB_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnB"));
 	if (IsChangeArmLength)
@@ -194,7 +198,7 @@ void APlayerBase::Tick(float DeltaTime)
 	
 }
 
-// Called to bind functionality to input
+// input관련된 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
