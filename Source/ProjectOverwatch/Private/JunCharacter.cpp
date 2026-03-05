@@ -32,7 +32,7 @@ AJunCharacter::AJunCharacter()
 	// 3-1 springArm 컴포넌트 붙이기
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(RootComponent);
-	SpringArmComponent->SetRelativeLocation(FVector(30.0f, 0.0f, 70.0f));
+	SpringArmComponent->SetRelativeLocation(FVector(20.0f, 0.0f, 70.0f));
 	SpringArmComponent->TargetArmLength = 10;
 	SpringArmComponent->bUsePawnControlRotation = true;
 	// 3-2 CameraComponent 붙이기
@@ -43,7 +43,10 @@ AJunCharacter::AJunCharacter()
 	//카메라 마우스방향 조절?
 	bUseControllerRotationYaw = true;
 	//2단 점프
-	JumpMaxCount = 2;
+	JumpMaxCount = 1;
+	
+	//점프 높이 올려~
+	GetCharacterMovement()->JumpZVelocity = 600.f;
 	
 	//중력계쑤
 	
