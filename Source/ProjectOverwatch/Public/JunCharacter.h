@@ -95,7 +95,7 @@ public:
 	class UInputAction* IA_JunRight;
 	void right(const struct FInputActionValue& inputValue);
 
-	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UCharacterMovementComponent* MoveComp;
 	
 private:

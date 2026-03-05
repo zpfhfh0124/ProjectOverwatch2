@@ -34,8 +34,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = BodyMesh)
 	class UStaticMeshComponent* bodyMeshComp;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<class AJunRocketExplosion> ExplosionFactory;
 	
 	
 	FVector Direction;

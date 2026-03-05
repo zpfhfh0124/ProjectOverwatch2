@@ -38,8 +38,8 @@ AJunRocket::AJunRocket()
 	movementComp->SetUpdatedComponent(collisionComp);
 	
 	movementComp->ProjectileGravityScale = 0.f;
-	movementComp->InitialSpeed = 2000;
-	movementComp->MaxSpeed = 2000;
+	movementComp->InitialSpeed = 1500;
+	movementComp->MaxSpeed = 1500;
 	
 	
 }
