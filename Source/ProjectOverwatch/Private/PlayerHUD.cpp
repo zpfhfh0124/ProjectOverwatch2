@@ -5,6 +5,11 @@
 
 #include "Components/TextBlock.h"
 
+void UPlayerHUD::SetProjectileIcon(UImage* Icon)
+{
+	ProjectileIcon = Icon;
+}
+
 void UPlayerHUD::SetProjectileCount(int newCount, int maxCount)
 {
 	TextProjectileCount->SetText(FText::Format(FText::FromString("{0}/{1}"), newCount, maxCount));

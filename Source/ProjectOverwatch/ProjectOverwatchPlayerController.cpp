@@ -5,6 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "InputMappingContext.h"
+#include "PlayerHUD.h"
 #include "ProjectOverwatchCameraManager.h"
 #include "Blueprint/UserWidget.h"
 #include "ProjectOverwatch.h"
@@ -20,6 +21,21 @@ void AProjectOverwatchPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// GT----------------------------------------------
+	// HUD
+	if (IsLocalPlayerController() && HUDWidgetClass && !HUDWidget)
+	{
+		HUDWidget = CreateWidget<UPlayerHUD>(this, HUDWidgetClass);
+		if (HUDWidget)
+		{
+			HUDWidget->AddToPlayerScreen(0); // Or AddToViewport()
+		}
+		else
+		{
+			UE_LOG(LogProjectOverwatch, Error, TEXT("PlayerController HUD 부착 실패!."));
+		}
+	}
+	// ------------------------------------------------
 	
 	// only spawn touch controls on local player controllers
 	if (ShouldUseTouchControls() && IsLocalPlayerController())

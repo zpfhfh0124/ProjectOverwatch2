@@ -54,4 +54,12 @@ protected:
 
 	/** Returns true if the player should use UMG touch controls */
 	bool ShouldUseTouchControls() const;
+	
+	// 추가 ---------------------------------------
+	UPROPERTY(EditDefaultsOnly, Category = "HUD")
+	TSubclassOf<UUserWidget> HUDWidgetClass;
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UUserWidget> HUDWidget;
+	// --------------------------------------------
 };
