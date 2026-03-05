@@ -174,6 +174,8 @@ void APlayerBase::OnShift_Implementation()
 
 void APlayerBase::OnH_Implementation()
 {
+	// 오버랩 된 상황에서 h 키를 누를 때 발생하는 내용 추가.
+	// 공통적으로 사용되어야 함.
 }
 
 void APlayerBase::OnB_Implementation()
