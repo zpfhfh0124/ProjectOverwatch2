@@ -48,8 +48,8 @@ public:
 	int GetProjectileCurrCount();
 	
 	// 이벤트 함수
-	UFUNCTION()
-	void OnRep_ProjectileCount();
+	//UFUNCTION()
+	//void OnRep_ProjectileCount();
 	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };
