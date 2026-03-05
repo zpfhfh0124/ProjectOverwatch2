@@ -3,10 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ProjectOverwatchCharacter.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "PlayerBase.generated.h"
@@ -24,7 +22,7 @@ class PROJECTOVERWATCH_API APlayerBase : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
+	//생성자
 	APlayerBase();
 	
 	// components 
@@ -42,7 +40,7 @@ public:
 	bool IsChangeArmLength = false;
 	
 	// Mesh
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	USkeletalMeshComponent* SkeletalMesh;
 	
 	// 카메라 시점 변환용 (토글)
@@ -73,6 +71,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_B;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_H;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_Shift;
 	
 	// 플레이어 기본 Movement
@@ -91,7 +91,9 @@ public:
 	void OnF();			// F 키 입력
 	UFUNCTION(BlueprintNativeEvent, Category="Input")
 	void OnR();			// R 키 입력
-	UFUNCTION(Category="Input")
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
+	void OnH();			// H 키 입력
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
 	void OnB();			// B 키 입력
 	UFUNCTION(BlueprintNativeEvent, Category="Input")
 	void OnShift();		// 쉬프트 키 스킬
