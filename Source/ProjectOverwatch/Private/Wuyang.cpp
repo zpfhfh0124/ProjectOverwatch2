@@ -96,7 +96,7 @@ void AWuyang::MouseLBTrigger_Implementation()
 void AWuyang::SpawnWaterBall()
 {
 	UWorld* World = GetWorld();
-	if (World && WaterBallClass)d
+	if (World && WaterBallClass)
 	{
 		FTransform SpawnTransform = SpawnPoint->GetComponentTransform();
 		// 3. 스폰 옵션 설정 (소유자 설정 및 충돌 처리 방식)
