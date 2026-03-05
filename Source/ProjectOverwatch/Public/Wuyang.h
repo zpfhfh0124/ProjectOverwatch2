@@ -17,7 +17,21 @@ class PROJECTOVERWATCH_API AWuyang : public APlayerBase
 protected:
 	virtual void BeginPlay() override;
 
+	// UFUNCTION(BlueprintCallable, Category="Input")
+	// void MouseLBStart();
+	// UFUNCTION(BlueprintCallable, Category="Input")
+	// void MouseLBTrigger(const FInputActionValue& Value);
+	// UFUNCTION(BlueprintCallable, Category="Input")
+	// void MouseLBComplete();
+	
+	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+	
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UArrowComponent* SpawnPoint;
+	
+	AWuyang();
+	
 	virtual void OnB_Implementation() override;
 	virtual void OnE_Implementation() override;
 	virtual void OnF_Implementation() override;
@@ -27,4 +41,12 @@ public:
 	virtual void OnMouseRB_Implementation() override;
 	virtual void OnR_Implementation() override;
 	virtual void OnShift_Implementation() override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
+	TSubclassOf<class AActor> WaterBallClass;
+	
+	UPROPERTY()
+	AActor* CurrentWaterBall;
+	
+	void SpawnWaterBall();
 };
