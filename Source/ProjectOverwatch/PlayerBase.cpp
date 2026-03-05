@@ -27,6 +27,79 @@ APlayerBase::APlayerBase()
 	MoveComp->JumpZVelocity = 600.f;
 	MoveComp->NavAgentProps.bCanCrouch = true;
 	
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_Asset(TEXT("/Game/GT/Inputs/IMC_GT.IMC_GT"));
+	if (IMC_Asset.Succeeded())
+	{
+		InputMappingContext = IMC_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Move_Asset(TEXT("/Game/GT/Inputs/IA_GT_Move.IA_GT_Move"));
+	if (IA_Move_Asset.Succeeded())
+	{
+		IA_Move = IA_Move_Asset.Object;
+	}
+	// 3. IA 파일 연결 (예: 시점 회전)
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_LookYaw_Asset(TEXT("/Game/GT/Inputs/IA_GT_LookYaw.IA_GT_LookYaw"));
+	if (IA_LookYaw_Asset.Succeeded())
+	{
+		IA_LookYaw = IA_LookYaw_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_LookPitch_Asset(TEXT("/Game/GT/Inputs/IA_GT_LookPitch.IA_GT_LookPitch"));
+	if (IA_LookPitch_Asset.Succeeded())
+	{
+		IA_LookPitch = IA_LookPitch_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Jump_Asset(TEXT("/Game/GT/Inputs/IA_GT_Jump.IA_GT_Jump"));
+	if (IA_Jump_Asset.Succeeded())
+	{
+		IA_Jump = IA_Jump_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_AttackLB_Asset(TEXT("/Game/GT/Inputs/IA_GT_AttackLB.IA_GT_AttackLB"));
+	if (IA_AttackLB_Asset.Succeeded())
+	{
+		IA_AttackLB = IA_AttackLB_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_AttackRB_Asset(TEXT("/Game/GT/Inputs/IA_GT_AttackRB.IA_GT_AttackRB"));
+	if (IA_AttackRB_Asset.Succeeded())
+	{
+		IA_AttackRB = IA_AttackRB_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_E_Asset(TEXT("/Game/GT/Inputs/IA_GT_E.IA_GT_E"));
+	if (IA_E_Asset.Succeeded())
+	{
+		IA_E = IA_E_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_F_Asset(TEXT("/Game/GT/Inputs/IA_GT_F.IA_GT_F"));
+	if (IA_F_Asset.Succeeded())
+	{
+		IA_F = IA_F_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_R_Asset(TEXT("/Game/GT/Inputs/IA_GT_R.IA_GT_R"));
+	if (IA_R_Asset.Succeeded())
+	{
+		IA_R = IA_R_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_B_Asset(TEXT("/Game/GT/Inputs/IA_GT_B.IA_GT_B"));
+	if (IA_B_Asset.Succeeded())
+	{
+		IA_B = IA_B_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_H_Asset(TEXT("/Game/01_Common/IA_Key_H.IA_Key_H"));
+	if (IA_H_Asset.Succeeded())
+	{
+		IA_H = IA_H_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Shift_Asset(TEXT("/Game/GT/Inputs/IA_GT_Shift.IA_GT_Shift"));
+	if (IA_Shift_Asset.Succeeded())
+	{
+		IA_Shift = IA_Shift_Asset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Ctrl_Asset(TEXT("/Game/GT/Inputs/IA_Ctrl.IA_Ctrl"));
+	if (IA_Ctrl_Asset.Succeeded())
+	{
+		IA_Ctrl = IA_Ctrl_Asset.Object;
+	}
+	
+	
 }
 
 void APlayerBase::TogglePerspective_Implementation()
@@ -226,8 +299,8 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	}
 	
 	EIC->BindAction(IA_AttackLB, ETriggerEvent::Started, this, &APlayerBase::OnMouseLB);
-	EIC->BindAction(IA_AttackLB, ETriggerEvent::Triggered, this, &APlayerBase::OnMouseLB);
-	EIC->BindAction(IA_AttackLB, ETriggerEvent::Completed, this, &APlayerBase::OnMouseLB);
+	EIC->BindAction(IA_AttackLB, ETriggerEvent::Triggered, this, &APlayerBase::MouseLBTrigger);
+	EIC->BindAction(IA_AttackLB, ETriggerEvent::Completed, this, &APlayerBase::MouseLBComplete);
 	EIC->BindAction(IA_AttackRB, ETriggerEvent::Started, this, &APlayerBase::OnMouseRB);
 	EIC->BindAction(IA_E, ETriggerEvent::Started, this, &APlayerBase::OnE);
 	EIC->BindAction(IA_F, ETriggerEvent::Started, this, &APlayerBase::OnF);

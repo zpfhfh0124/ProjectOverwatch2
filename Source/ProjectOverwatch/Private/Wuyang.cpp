@@ -10,24 +10,6 @@ void AWuyang::BeginPlay()
 	Super::BeginPlay();
 }
 
-// void AWuyang::MouseLBStart()
-// {
-// }
-//
-// void AWuyang::MouseLBTrigger(const FInputActionValue& Value)
-// {
-// }
-//
-// void AWuyang::MouseLBComplete()
-// {
-// }
-
-void AWuyang::SetupPlayerInputComponent(UInputComponent* InputCompo)
-{
-	Super::SetupPlayerInputComponent(InputCompo);
-	
-}
-
 AWuyang::AWuyang()
 {
 	//sp
@@ -36,21 +18,6 @@ AWuyang::AWuyang()
 	SpawnPoint->ArrowSize = 1.0f;
 	SpawnPoint->ArrowColor = FColor(255, 0, 0, 255);
 	SpawnPoint->SetRelativeLocation(FVector(60.0f, 15.0f, -10.0f));
-}
-
-void AWuyang::OnB_Implementation()
-{
-	Super::OnB_Implementation();
-}
-
-void AWuyang::OnE_Implementation()
-{
-	Super::OnE_Implementation();
-}
-
-void AWuyang::OnF_Implementation()
-{
-	Super::OnF_Implementation();
 }
 
 void AWuyang::OnH_Implementation()
@@ -68,17 +35,17 @@ void AWuyang::OnMouseLB_Implementation()
 	Super::OnMouseLB_Implementation();
 }
 
-void AWuyang::OnMouseRB_Implementation()
-{
-	Super::OnMouseRB_Implementation();
-}
-
-void AWuyang::OnR_Implementation()
-{
-	Super::OnR_Implementation();
-}
-
 void AWuyang::OnShift_Implementation()
 {
 	Super::OnShift_Implementation();
+}
+
+void AWuyang::MouseLBComplete_Implementation()
+{
+	Super::MouseLBComplete_Implementation();
+}
+
+void AWuyang::MouseLBTrigger_Implementation()
+{
+	Super::MouseLBTrigger_Implementation();
 }
