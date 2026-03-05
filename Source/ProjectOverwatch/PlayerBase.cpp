@@ -5,6 +5,7 @@
 #include "PlayerBase.h"
 
 #include "InputMappingContext.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 APlayerBase::APlayerBase()
@@ -18,6 +19,13 @@ APlayerBase::APlayerBase()
 	
 	FPCamera = CreateDefaultSubobject<UCameraComponent>(FName("Camera"));
 	FPCamera->SetupAttachment(SpringArm);
+	
+	MoveComp = GetCharacterMovement();
+	MoveComp->bCanWalkOffLedges = true;
+	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
+	MoveComp->JumpZVelocity = 600.f;
+	MoveComp->NavAgentProps.bCanCrouch = true;
+	
 }
 
 void APlayerBase::TogglePerspective_Implementation()
@@ -26,6 +34,7 @@ void APlayerBase::TogglePerspective_Implementation()
 	if (PerspectiveMode == EPerspectiveMode::FirstPerson) SetPerspectiveMode(EPerspectiveMode::ThirdPerson);
 	else SetPerspectiveMode(EPerspectiveMode::FirstPerson);
 }
+
 
 void APlayerBase::MoveInput(const FInputActionValue& Value)
 {
@@ -89,6 +98,25 @@ void APlayerBase::OnB()
 	TogglePerspective();
 }
 
+void APlayerBase::StopShift_Implementation()
+{
+}
+
+void APlayerBase::OnCtrl_Implementation()
+{
+	if (GetCharacterMovement() && GetCharacterMovement()->IsFalling())
+	{
+		return; // 공중이면 앉기 금지
+	}
+
+	Crouch();
+}
+
+void APlayerBase::StopCtrl_Implementation()
+{
+	UnCrouch();
+}
+
 void APlayerBase::SetPerspectiveMode(EPerspectiveMode NewMode)
 {
 	if ( PerspectiveMode == NewMode ) return;
@@ -124,8 +152,16 @@ void APlayerBase::BeginPlay()
 		}
 	}
 	
-	// 최대 2단 점프까지 가능하도록 설정
-	this->JumpMaxCount = 2;
+	APlayerCameraManager* CameraManager = GetLocalViewingPlayerController()->PlayerCameraManager;
+	if (CameraManager)
+	{
+		CameraManager->ViewPitchMax = 90.0f;
+		CameraManager->ViewPitchMin = -90.f;
+	}
+	
+	// 최대 1단 점프까지 가능하도록 설정
+	this->JumpMaxCount = 1;
+
 }
 
 // Called every frame
@@ -150,6 +186,12 @@ void APlayerBase::Tick(float DeltaTime)
 			IsChangeArmLength = false;
 		}
 	}
+	
+	if (bIsCrouched && GetCharacterMovement() && GetCharacterMovement()->IsFalling())
+	{
+		UnCrouch();
+	}
+	
 }
 
 // Called to bind functionality to input
@@ -177,5 +219,9 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EIC->BindAction(IA_R, ETriggerEvent::Started, this, &APlayerBase::OnR);
 	EIC->BindAction(IA_B, ETriggerEvent::Started, this, &APlayerBase::OnB);
 	EIC->BindAction(IA_Shift, ETriggerEvent::Started, this, &APlayerBase::OnShift);
+	EIC->BindAction(IA_Shift, ETriggerEvent::Completed, this, &APlayerBase::StopShift);
+	EIC->BindAction(IA_Ctrl, ETriggerEvent::Started, this, &APlayerBase::OnCtrl);
+	EIC->BindAction(IA_Ctrl, ETriggerEvent::Completed, this, &APlayerBase::StopCtrl);
+	
 }
 
