@@ -4,6 +4,7 @@
 #define THIRD_PERSON_ARM_LENGTH 300.0f
 
 #include "PlayerBase.h"
+#include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -61,6 +62,14 @@ void APlayerBase::LookPitchInput(const FInputActionValue& Value)
 {
 	const float Axis = Value.Get<float>();
 	AddControllerPitchInput(Axis);
+}
+
+void APlayerBase::MouseLBComplete_Implementation()
+{
+}
+
+void APlayerBase::MouseLBTrigger_Implementation()
+{
 }
 
 void APlayerBase::OnE_Implementation()
@@ -217,11 +226,14 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	}
 	
 	EIC->BindAction(IA_AttackLB, ETriggerEvent::Started, this, &APlayerBase::OnMouseLB);
+	EIC->BindAction(IA_AttackLB, ETriggerEvent::Triggered, this, &APlayerBase::OnMouseLB);
+	EIC->BindAction(IA_AttackLB, ETriggerEvent::Completed, this, &APlayerBase::OnMouseLB);
 	EIC->BindAction(IA_AttackRB, ETriggerEvent::Started, this, &APlayerBase::OnMouseRB);
 	EIC->BindAction(IA_E, ETriggerEvent::Started, this, &APlayerBase::OnE);
 	EIC->BindAction(IA_F, ETriggerEvent::Started, this, &APlayerBase::OnF);
 	EIC->BindAction(IA_R, ETriggerEvent::Started, this, &APlayerBase::OnR);
 	EIC->BindAction(IA_B, ETriggerEvent::Started, this, &APlayerBase::OnB);
+	EIC->BindAction(IA_H, ETriggerEvent::Started, this, &APlayerBase::OnH);
 	EIC->BindAction(IA_Shift, ETriggerEvent::Started, this, &APlayerBase::OnShift);
 	EIC->BindAction(IA_Shift, ETriggerEvent::Completed, this, &APlayerBase::StopShift);
 	EIC->BindAction(IA_Ctrl, ETriggerEvent::Started, this, &APlayerBase::OnCtrl);
