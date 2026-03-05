@@ -92,6 +92,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Input")
 	void OnMouseLB();	// 일반 공격
 	UFUNCTION(BlueprintNativeEvent, Category="Input")
+	void MouseLBTrigger();	// 일반 공격
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
+	void MouseLBComplete();	// 일반 공격
+	UFUNCTION(BlueprintNativeEvent, Category="Input")
 	void OnMouseRB();	// 일반 공격 2
 	UFUNCTION(BlueprintNativeEvent, Category="Input")
 	void OnE();			// E 스킬
@@ -129,6 +133,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override final;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };
