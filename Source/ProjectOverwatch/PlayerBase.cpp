@@ -26,7 +26,18 @@ APlayerBase::APlayerBase()
 	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
 	MoveComp->JumpZVelocity = 600.f;
 	MoveComp->NavAgentProps.bCanCrouch = true;
-	
+}
+
+void APlayerBase::TogglePerspective_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("TogglePerspective_Implementation"));
+	if (PerspectiveMode == EPerspectiveMode::FirstPerson) SetPerspectiveMode(EPerspectiveMode::ThirdPerson);
+	else SetPerspectiveMode(EPerspectiveMode::FirstPerson);
+}
+
+
+void APlayerBase::InitializeInputs()
+{
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_Asset(TEXT("/Game/GT/Inputs/IMC_GT.IMC_GT"));
 	if (IMC_Asset.Succeeded())
 	{
@@ -98,17 +109,7 @@ APlayerBase::APlayerBase()
 	{
 		IA_Ctrl = IA_Ctrl_Asset.Object;
 	}
-	
-	
 }
-
-void APlayerBase::TogglePerspective_Implementation()
-{
-	UE_LOG(LogTemp, Warning, TEXT("TogglePerspective_Implementation"));
-	if (PerspectiveMode == EPerspectiveMode::FirstPerson) SetPerspectiveMode(EPerspectiveMode::ThirdPerson);
-	else SetPerspectiveMode(EPerspectiveMode::FirstPerson);
-}
-
 
 void APlayerBase::MoveInput(const FInputActionValue& Value)
 {

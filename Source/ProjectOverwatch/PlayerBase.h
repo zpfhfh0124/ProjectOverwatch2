@@ -80,7 +80,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_Ctrl;
 
-	
+	void InitializeInputs();
 	bool bIsShifting = false;
 	
 	// 플레이어 기본 Movement
