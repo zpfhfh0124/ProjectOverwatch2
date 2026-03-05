@@ -26,6 +26,8 @@ APlayerBase::APlayerBase()
 	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
 	MoveComp->JumpZVelocity = 600.f;
 	MoveComp->NavAgentProps.bCanCrouch = true;
+	
+	InitializeInputs();
 }
 
 void APlayerBase::TogglePerspective_Implementation()

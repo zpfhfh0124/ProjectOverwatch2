@@ -12,7 +12,7 @@ void AWuyang::BeginPlay()
 
 AWuyang::AWuyang()
 {
-	//sp
+	//스폰애로우 생성
 	SpawnPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("SpawnPoint"));
 	SpawnPoint->SetupAttachment(FPCamera);
 	SpawnPoint->ArrowSize = 1.0f;
