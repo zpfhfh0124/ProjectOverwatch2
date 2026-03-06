@@ -24,8 +24,9 @@ APlayerBase::APlayerBase()
 	MoveComp = GetCharacterMovement();
 	MoveComp->bCanWalkOffLedges = true;
 	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
-	MoveComp->JumpZVelocity = 600.f;
+	// MoveComp->JumpZVelocity = 600.f;
 	MoveComp->NavAgentProps.bCanCrouch = true;
+	MoveComp->AirControl = 0.5f;
 	
 	InitializeInputs();
 }
@@ -138,6 +139,11 @@ void APlayerBase::LookPitchInput(const FInputActionValue& Value)
 {
 	const float Axis = Value.Get<float>();
 	AddControllerPitchInput(Axis);
+}
+
+void APlayerBase::JumpVelocityInput(float value)
+{
+	MoveComp->JumpZVelocity = value;
 }
 
 void APlayerBase::MouseLBComplete_Implementation()
