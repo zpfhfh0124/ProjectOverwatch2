@@ -24,9 +24,23 @@ APlayerBase::APlayerBase()
 	MoveComp = GetCharacterMovement();
 	MoveComp->bCanWalkOffLedges = true;
 	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
-	MoveComp->JumpZVelocity = 600.f;
+	// MoveComp->JumpZVelocity = 600.f;
 	MoveComp->NavAgentProps.bCanCrouch = true;
+	MoveComp->AirControl = 0.5f;
 	
+	InitializeInputs();
+}
+
+void APlayerBase::TogglePerspective_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("TogglePerspective_Implementation"));
+	if (PerspectiveMode == EPerspectiveMode::FirstPerson) SetPerspectiveMode(EPerspectiveMode::ThirdPerson);
+	else SetPerspectiveMode(EPerspectiveMode::FirstPerson);
+}
+
+
+void APlayerBase::InitializeInputs()
+{
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_Asset(TEXT("/Game/GT/Inputs/IMC_GT.IMC_GT"));
 	if (IMC_Asset.Succeeded())
 	{
@@ -98,17 +112,7 @@ APlayerBase::APlayerBase()
 	{
 		IA_Ctrl = IA_Ctrl_Asset.Object;
 	}
-	
-	
 }
-
-void APlayerBase::TogglePerspective_Implementation()
-{
-	UE_LOG(LogTemp, Warning, TEXT("TogglePerspective_Implementation"));
-	if (PerspectiveMode == EPerspectiveMode::FirstPerson) SetPerspectiveMode(EPerspectiveMode::ThirdPerson);
-	else SetPerspectiveMode(EPerspectiveMode::FirstPerson);
-}
-
 
 void APlayerBase::MoveInput(const FInputActionValue& Value)
 {
@@ -135,6 +139,11 @@ void APlayerBase::LookPitchInput(const FInputActionValue& Value)
 {
 	const float Axis = Value.Get<float>();
 	AddControllerPitchInput(Axis);
+}
+
+void APlayerBase::JumpVelocityInput(float value)
+{
+	MoveComp->JumpZVelocity = value;
 }
 
 void APlayerBase::MouseLBComplete_Implementation()
@@ -171,6 +180,8 @@ void APlayerBase::OnShift_Implementation()
 
 void APlayerBase::OnH_Implementation()
 {
+	// 오버랩 된 상황에서 h 키를 누를 때 발생하는 내용 추가.
+	// 공통적으로 사용되어야 함.
 }
 
 void APlayerBase::OnB_Implementation()

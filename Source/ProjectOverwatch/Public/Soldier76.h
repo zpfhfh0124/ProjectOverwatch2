@@ -24,7 +24,10 @@ protected:
 	// --- Soldier weapon/aim ---
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon")
 	TSubclassOf<AJunRocket> RocketFactory;
-
+	
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon")
+	//U* FirePoint;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon")
 	USceneComponent* FirePoint;
 
@@ -45,11 +48,34 @@ protected:
 	virtual void StopShift_Implementation() override;
 
 	virtual void OnMouseRB_Implementation() override; // 로켓 발사
-	// 필요하면 LB(일반 총)도 여기서 구현
-	// virtual void OnMouseLB_Implementation() override;
 
 private:
 	bool GetAimPointFromCamera(FVector& OutAimPoint, FVector& OutTraceEnd) const;
 	void FireRocket();
 
+	UPROPERTY(EditDefaultsOnly, Category="Weapon|Rifle")
+	float FireRate = 9.f; // 초당 9발
+
+	UPROPERTY(EditDefaultsOnly, Category="Weapon|Rifle")
+	float RifleRange = 30000.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Weapon|Rifle")
+	TEnumAsByte<ECollisionChannel> RifleTraceChannel = ECC_Visibility;
+
+	FTimerHandle RifleTimer;
+	bool bRifleFiring = false;
+	
+	void StartRifle();
+	void StopRifle();
+	void FireRifleOnce();
+	
+	UPROPERTY(EditDefaultsOnly, Category="Weapon|Rifle|Spread")
+	float SpreadDeg = 1.5f; // ✅ 항상 일정한 스프레드(각도)
+
+	FVector GetSpreadDirection(const FVector& BaseDir) const;
+
+public:
+	// 필요하면 LB(일반 총)도 여기서 구현
+	virtual void MouseLBComplete_Implementation() override;
+	virtual void MouseLBTrigger_Implementation() override;
 };

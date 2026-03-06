@@ -23,10 +23,9 @@ public:
 	
 	AWuyang();
 	
-	virtual void OnH_Implementation() override;
-	virtual void Tick(float DeltaTime) override;
 	virtual void OnMouseLB_Implementation() override;
 	virtual void OnShift_Implementation() override;
+	void ShiftCoolReset();
 	virtual void MouseLBComplete_Implementation() override;
 	virtual void MouseLBTrigger_Implementation() override;
 	
