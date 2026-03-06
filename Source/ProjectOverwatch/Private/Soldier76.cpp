@@ -6,7 +6,6 @@
 
 #include "JunRocket.h"
 #include "Components/SceneComponent.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -71,6 +70,88 @@ void ASoldier76::OnMouseRB_Implementation()
 	FireRocket();
 }
 
+void ASoldier76::OnMouseLB_Implementation()
+{
+	APlayerController* PC = Cast<APlayerController>(Controller);
+	if (!PC) return;
+
+	// ✅ Triggered(누르는 동안)에는 true, Completed(뗄 때)에는 false가 됨
+	const bool bDown = PC->IsInputKeyDown(EKeys::LeftMouseButton);
+
+	if (bDown)
+	{
+		if (!bRifleFiring)
+		{
+			StartRifle();
+		}
+	}
+	else
+	{
+		// Completed 때 여기로 들어와서 깔끔하게 정지됨
+		if (bRifleFiring)
+		{
+			StopRifle();
+		}
+	}
+}
+
+void ASoldier76::StartRifle()
+{
+	bRifleFiring = true;
+
+	FireRifleOnce(); // ✅ 눌렀을 때 즉시 1발
+
+	const float Interval = 1.f / FireRate; // 9 -> 0.1111...
+	GetWorldTimerManager().SetTimer(
+		RifleTimer,
+		this,
+		&ASoldier76::FireRifleOnce,
+		Interval,
+		true
+	);
+}
+
+void ASoldier76::StopRifle()
+{
+	bRifleFiring = false;
+	GetWorldTimerManager().ClearTimer(RifleTimer);
+}
+
+FVector ASoldier76::GetSpreadDirection(const FVector& BaseDir) const
+{
+	// ✅ BaseDir를 중심으로 cone 안에서 랜덤 방향 생성
+	const float HalfAngleRad = FMath::DegreesToRadians(SpreadDeg);
+	return FMath::VRandCone(BaseDir.GetSafeNormal(), HalfAngleRad).GetSafeNormal();
+}
+
+void ASoldier76::FireRifleOnce()
+{
+	if (!FPCamera) return;
+
+	const FVector Start = FPCamera->GetComponentLocation();
+
+	const FVector BaseDir = FPCamera->GetForwardVector();
+	const FVector ShotDir = GetSpreadDirection(BaseDir); // ✅ 스프레드 적용
+
+	const FVector End = Start + (ShotDir * RifleRange);
+
+	FHitResult Hit;
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(SoldierRifleTrace), true);
+	Params.AddIgnoredActor(this);
+
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(
+		Hit, Start, End, ECC_Visibility, Params
+	);
+
+	// Debug (원하면 지워도 됨)
+	DrawDebugLine(GetWorld(), Start, bHit ? Hit.ImpactPoint : End, FColor::Green, false, 0.2f, 0, 1.5f);
+	if (bHit)
+	{
+		DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 8.f, FColor::Red, false, 0.2f);
+		// TODO: 데미지/이펙트 처리
+	}
+}
+
 void ASoldier76::FireRocket()
 {
 	if (!FirePoint || !RocketFactory) return;
@@ -79,7 +160,7 @@ void ASoldier76::FireRocket()
 	FVector AimPoint, TraceEnd;
 	if (!GetAimPointFromCamera(AimPoint, TraceEnd)) return;
 
-	const FVector MuzzleLoc = FirePoint->GetComponentLocation();
+	const FVector MuzzleLoc = FPCamera->GetComponentLocation();
 	const FRotator SpawnRot = (AimPoint - MuzzleLoc).Rotation();
 
 	FActorSpawnParameters Params;
