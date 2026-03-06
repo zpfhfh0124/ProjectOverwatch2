@@ -70,7 +70,7 @@ void ASoldier76::OnMouseRB_Implementation()
 	FireRocket();
 }
 
-void ASoldier76::OnMouseLB_Implementation()
+void ASoldier76::MouseLBTrigger_Implementation()
 {
 	APlayerController* PC = Cast<APlayerController>(Controller);
 	if (!PC) return;
@@ -122,6 +122,13 @@ FVector ASoldier76::GetSpreadDirection(const FVector& BaseDir) const
 	// ✅ BaseDir를 중심으로 cone 안에서 랜덤 방향 생성
 	const float HalfAngleRad = FMath::DegreesToRadians(SpreadDeg);
 	return FMath::VRandCone(BaseDir.GetSafeNormal(), HalfAngleRad).GetSafeNormal();
+}
+
+void ASoldier76::MouseLBComplete_Implementation()
+{
+	Super::MouseLBComplete_Implementation();
+	
+	StopRifle();
 }
 
 void ASoldier76::FireRifleOnce()

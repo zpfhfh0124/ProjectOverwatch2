@@ -48,8 +48,6 @@ protected:
 	virtual void StopShift_Implementation() override;
 
 	virtual void OnMouseRB_Implementation() override; // 로켓 발사
-	// 필요하면 LB(일반 총)도 여기서 구현
-	virtual void OnMouseLB_Implementation() override;
 
 private:
 	bool GetAimPointFromCamera(FVector& OutAimPoint, FVector& OutTraceEnd) const;
@@ -75,4 +73,9 @@ private:
 	float SpreadDeg = 1.5f; // ✅ 항상 일정한 스프레드(각도)
 
 	FVector GetSpreadDirection(const FVector& BaseDir) const;
+
+public:
+	// 필요하면 LB(일반 총)도 여기서 구현
+	virtual void MouseLBComplete_Implementation() override;
+	virtual void MouseLBTrigger_Implementation() override;
 };
