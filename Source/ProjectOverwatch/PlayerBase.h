@@ -132,7 +132,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+	bool IsShiftSkillActive = false;
+	bool IsESkillActivate = false;
 	FTimerHandle ShiftTimerHandle;
 	FTimerHandle ETimerHandle;
 
