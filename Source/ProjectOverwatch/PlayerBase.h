@@ -87,6 +87,7 @@ public:
 	virtual void MoveInput(const FInputActionValue& Value);
 	void LookYawInput(const FInputActionValue& Value);
 	void LookPitchInput(const FInputActionValue& Value);
+	void JumpVelocityInput(float value);
 	
 	// 공용 입력 엔트리 (E스킬, F키, Shift ...) (BP/C++에서 Override 가능)
 	UFUNCTION(BlueprintNativeEvent, Category="Input")
@@ -131,6 +132,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	FTimerHandle ShiftTimerHandle;
+	FTimerHandle ETimerHandle;
+	bool IsShiftSkillActive = false;
+	bool IsESkillActivate = false;
+	float CountShiftCoolTime = 1.0f;
+	float CountECoolTime = 1.0f;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
