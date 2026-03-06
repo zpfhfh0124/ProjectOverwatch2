@@ -132,10 +132,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	bool IsShiftSkillActive = false;
-	bool IsESkillActivate = false;
 	FTimerHandle ShiftTimerHandle;
 	FTimerHandle ETimerHandle;
+	bool IsShiftSkillActive = false;
+	bool IsESkillActivate = false;
+	float CountShiftCoolTime = 1.0f;
+	float CountECoolTime = 1.0f;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
