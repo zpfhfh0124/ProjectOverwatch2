@@ -88,6 +88,7 @@ public:
 	void LookYawInput(const FInputActionValue& Value);
 	void LookPitchInput(const FInputActionValue& Value);
 	void JumpVelocityInput(float value);
+	void MoveSpeedInput(float speedValue, float accelValue);
 	
 	// 공용 입력 엔트리 (E스킬, F키, Shift ...) (BP/C++에서 Override 가능)
 	UFUNCTION(BlueprintNativeEvent, Category="Input")
