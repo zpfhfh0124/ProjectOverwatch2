@@ -3,6 +3,8 @@
 
 #include "OverwatchPlayerState.h"
 
+#include "Net/UnrealNetwork.h"
+
 void AOverwatchPlayerState::SetPlayer(APlayerBase* PlayerCharacter)
 {
 	Player = PlayerCharacter;
@@ -39,6 +41,7 @@ int AOverwatchPlayerState::GetProjectileMaxCount()
 void AOverwatchPlayerState::SetProjectileCurrCount(int newProjectileCurrCount)
 {
 	ProjectileCurrCount = newProjectileCurrCount;
+	OnHUDProjectileCountUpdate.Broadcast(ProjectileCurrCount, ProjectileMaxCount);
 }
 
 int AOverwatchPlayerState::GetProjectileCurrCount()
@@ -50,5 +53,5 @@ void AOverwatchPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
-	//DOREPLIFETIME(AOverwatchPlayerState, CurHP);
+	DOREPLIFETIME(AOverwatchPlayerState, ProjectileCurrCount);
 }
