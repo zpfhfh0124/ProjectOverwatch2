@@ -17,7 +17,7 @@ AShuriken::AShuriken()
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SetRootComponent(Collision);
 	Collision->InitSphereRadius(8.f);
-	Collision->SetCollisionProfileName(TEXT("Projectile"));
+	Collision->SetCollisionProfileName(TEXT("BlueProjectile"));
 	Collision->SetNotifyRigidBodyCollision(true);
 	Collision->OnComponentHit.AddDynamic(this, &AShuriken::OnHit);
 	Collision->SetEnableGravity(false);
