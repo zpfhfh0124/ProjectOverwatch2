@@ -6,7 +6,7 @@
 #include "GameFramework/PlayerState.h"
 #include "OverwatchPlayerState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHUDProjectileCountUpdate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHUDProjectileCountUpdate, int32, CurrCount, int32, MaxCount);
 
 /**
  * 
@@ -42,8 +42,10 @@ public:
 	void SetMaxHP(int newMaxHP);
 	void SetHP(int value);
 	int32 GetHP();
+	UFUNCTION(BlueprintCallable)
 	void SetProjectileMaxCount(int newProjectileMaxCount);
 	int GetProjectileMaxCount();
+	UFUNCTION(BlueprintCallable)
 	void SetProjectileCurrCount(int newProjectileCurrCount);
 	int GetProjectileCurrCount();
 	

@@ -35,5 +35,8 @@ public:
 	void SetProjectileIcon(UImage* Icon);
 	
 	// 소모형 무기 잔량 표시
+	UFUNCTION()
 	void SetProjectileCount(int newCount, int maxCount);
+
+	virtual void NativeConstruct() override;
 };
