@@ -30,8 +30,8 @@ void AWuyang::OnMouseLB_Implementation()
 void AWuyang::OnShift_Implementation()
 {
 	if (IsShiftSkillActive) return;
-	//추후 생성 (이동 속도 강화 및 점프 사거리 추가)
-	JumpVelocityInput(800.0f);
+	JumpVelocityInput(700.0f);
+	MoveSpeedInput(1000.0f, 3000.0f);
 	IsShiftSkillActive = true;
 	// n초 후 효력 정상화
 	GetWorld()->GetTimerManager().SetTimer(
@@ -44,6 +44,7 @@ void AWuyang::OnShift_Implementation()
 void AWuyang::ShiftCoolReset()
 {
 	JumpVelocityInput(420.0f);
+	MoveSpeedInput(600.0f, 2048.0f);
 	IsShiftSkillActive = false;
 }
 

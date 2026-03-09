@@ -147,6 +147,12 @@ void APlayerBase::JumpVelocityInput(float value)
 	MoveComp->JumpZVelocity = value;
 }
 
+void APlayerBase::MoveSpeedInput(float speedValue, float accelValue)
+{
+	MoveComp->MaxWalkSpeed = speedValue;
+	MoveComp->MaxAcceleration = accelValue;
+}
+
 void APlayerBase::MouseLBComplete_Implementation()
 {
 }
