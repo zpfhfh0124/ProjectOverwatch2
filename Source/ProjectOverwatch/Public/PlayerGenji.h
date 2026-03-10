@@ -26,6 +26,7 @@ public :
 	float EDuration = 2.f;
 	
 	virtual void BeginPlay() override;
+	virtual void InitIcons() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetReflectionBoxComp(bool Enable);

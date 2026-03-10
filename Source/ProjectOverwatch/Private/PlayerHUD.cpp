@@ -4,16 +4,28 @@
 #include "PlayerHUD.h"
 
 #include "OverwatchPlayerState.h"
+#include "PaperSprite.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 
-void UPlayerHUD::SetProjectileIcon(UImage* Icon)
+void UPlayerHUD::SetProjectileIcon(UPaperSprite* Icon)
 {
-	ProjectileIcon = Icon;
+	ProjectileIcon->SetBrushFromAtlasInterface(Icon);
 }
 
 void UPlayerHUD::SetProjectileCount(int newCount, int maxCount)
 {
 	TextProjectileCount->SetText(FText::Format(FText::FromString("{0}/{1}"), newCount, maxCount));
+}
+
+void UPlayerHUD::SetSkillEIcon(UPaperSprite* Icon)
+{
+	SkillEIcon->SetBrushFromAtlasInterface(Icon);
+}
+
+void UPlayerHUD::SetSkillShiftLIcon(UPaperSprite* Icon)
+{
+	SkillShiftLIcon->SetBrushFromAtlasInterface(Icon);
 }
 
 void UPlayerHUD::NativeConstruct()

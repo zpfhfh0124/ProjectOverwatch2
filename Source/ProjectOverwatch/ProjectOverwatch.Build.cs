@@ -21,7 +21,7 @@ public class ProjectOverwatch : ModuleRules
 			"Slate"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+		PrivateDependencyModuleNames.AddRange(new string[] { "Paper2D", "Paper2D" });
 
 		PublicIncludePaths.AddRange(new string[] {
 			"ProjectOverwatch",

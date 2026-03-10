@@ -90,3 +90,8 @@ bool AProjectOverwatchPlayerController::ShouldUseTouchControls() const
 	// are we on a mobile platform? Should we force touch?
 	return SVirtualJoystick::ShouldDisplayTouchInterface() || bForceTouchControls;
 }
+
+class UPlayerHUD* AProjectOverwatchPlayerController::GetPlayerHUD() const
+{
+	return Cast<UPlayerHUD>(HUDWidget);
+}
