@@ -24,6 +24,7 @@ public class ProjectOverwatch : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] 
 		{
+			"Paper2D"
 		});
 
 		PublicIncludePaths.AddRange(new string[] {
