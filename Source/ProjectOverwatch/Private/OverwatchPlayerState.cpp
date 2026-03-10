@@ -3,7 +3,11 @@
 
 #include "OverwatchPlayerState.h"
 
+#include "PlayerHUD.h"
+#include "ProjectOverwatchPlayerController.h"
+#include "Components/Image.h"
 #include "Net/UnrealNetwork.h"
+#include "PaperSprite.h"
 
 void AOverwatchPlayerState::SetPlayer(APlayerBase* PlayerCharacter)
 {
@@ -30,7 +34,7 @@ int32 AOverwatchPlayerState::GetHP()
 void AOverwatchPlayerState::SetProjectileMaxCount(int newProjectileMaxCount)
 {
 	ProjectileMaxCount = newProjectileMaxCount;
-	PC = newProjectileMaxCount;
+	PCC = newProjectileMaxCount;
 }
 
 int AOverwatchPlayerState::GetProjectileMaxCount()
@@ -54,4 +58,46 @@ void AOverwatchPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(AOverwatchPlayerState, ProjectileCurrCount);
+}
+
+void AOverwatchPlayerState::SetProjectileIcon(const FString& Path)
+{
+	auto* PC = Cast<AProjectOverwatchPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
+	{
+		auto* Icon = LoadObject<UPaperSprite>(nullptr, *Path);
+		PC->GetPlayerHUD()->SetProjectileIcon(Icon);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("SetProjectileIcon Icon을 못찾았다!"));
+	}
+}
+
+void AOverwatchPlayerState::SetSkillEIcon(const FString& Path)
+{
+	auto* PC = Cast<AProjectOverwatchPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
+	{
+		auto* Icon = LoadObject<UPaperSprite>(nullptr, *Path);
+		PC->GetPlayerHUD()->SetSkillEIcon(Icon);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("SetSkillEIcon Icon을 못찾았다!"));
+	}
+}
+
+void AOverwatchPlayerState::SetSkillShiftLIcon(const FString& Path)
+{
+	auto* PC = Cast<AProjectOverwatchPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
+	{
+		auto* Icon = LoadObject<UPaperSprite>(nullptr, *Path);
+		PC->GetPlayerHUD()->SetSkillShiftLIcon(Icon);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("SetSkillShiftLIcon Icon을 못찾았다!"));
+	}
 }

@@ -125,11 +125,21 @@ public:
 	EPerspectiveMode GetPerspectiveMode() const { return PerspectiveMode; }
 	UFUNCTION(BlueprintCallable, Category="Combat")
 	FVector GetForwardDir() const;
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// 각 플레이어 HUD 아이콘 세팅
+	virtual void InitIcons();
+	
+	// 각 아이콘 경로
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ProjectileIconPath;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString SkillEIconPath;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString SkillShiftLIconPath;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

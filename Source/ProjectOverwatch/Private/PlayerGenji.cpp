@@ -24,6 +24,17 @@ void APlayerGenji::BeginPlay()
 	// 쿨타임 지정
 	CountShiftCoolTime = 10.0f;
 	CountECoolTime = 5.0f;
+	
+	InitIcons();
+}
+
+void APlayerGenji::InitIcons()
+{
+	ProjectileIconPath = "/Script/Paper2D.PaperSprite'/Game/GT/UI/Sprites/Projectile_Genji_Sprite_0.Projectile_Genji_Sprite_0'";
+	SkillEIconPath = "/Script/Paper2D.PaperSprite'/Game/GT/UI/Sprites/Skill_Genji_Sprite_1.Skill_Genji_Sprite_1'";
+	SkillShiftLIconPath = "/Script/Paper2D.PaperSprite'/Game/GT/UI/Sprites/Skill_Genji_Sprite_0.Skill_Genji_Sprite_0'";
+	
+	Super::InitIcons();
 }
 
 void APlayerGenji::SetReflectionBoxComp(bool Enable)

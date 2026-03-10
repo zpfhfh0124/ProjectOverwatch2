@@ -6,6 +6,7 @@
 #include "PlayerBase.h"
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
+#include "OverwatchPlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -266,6 +267,19 @@ void APlayerBase::BeginPlay()
 	// 최대 1단 점프까지 가능하도록 설정
 	this->JumpMaxCount = 1;
 
+}
+
+void APlayerBase::InitIcons()
+{
+	// 자식 클래스에서 Path 설정 해주어야 함.
+	
+	auto* PS = Cast<AOverwatchPlayerState>(GetPlayerState());
+	if (PS)
+	{
+		PS->SetProjectileIcon(ProjectileIconPath);
+		PS->SetSkillEIcon(SkillEIconPath);
+		PS->SetSkillShiftLIcon(SkillShiftLIconPath);
+	}
 }
 
 // Called every frame

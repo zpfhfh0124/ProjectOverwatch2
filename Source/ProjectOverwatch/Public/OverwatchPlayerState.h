@@ -35,7 +35,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int ProjectileCurrCount;
 	
-	__declspec(property(get=GetProjectileCurrCount, put=SetProjectileCurrCount)) int PC;
+	__declspec(property(get=GetProjectileCurrCount, put=SetProjectileCurrCount)) int PCC;
 	
 	UFUNCTION(BlueprintCallable)
 	void SetPlayer(APlayerBase* PlayerCharacter);
@@ -49,9 +49,13 @@ public:
 	void SetProjectileCurrCount(int newProjectileCurrCount);
 	int GetProjectileCurrCount();
 	
-	// 이벤트 함수
-	//UFUNCTION()
-	//void OnRep_ProjectileCount();
-	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	// HUD 아이콘 설정
+	UFUNCTION(BlueprintCallable)
+	void SetProjectileIcon(const FString& Path);
+	UFUNCTION(BlueprintCallable)
+	void SetSkillEIcon(const FString& Path);
+	UFUNCTION(BlueprintCallable)
+	void SetSkillShiftLIcon(const FString& Path);
 };

@@ -61,5 +61,9 @@ protected:
 	
 	UPROPERTY(Transient)
 	TObjectPtr<UUserWidget> HUDWidget;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "HUD")
+	class UPlayerHUD* GetPlayerHUD() const;
 	// --------------------------------------------
 };
