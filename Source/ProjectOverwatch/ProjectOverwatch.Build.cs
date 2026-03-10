@@ -18,10 +18,14 @@ public class ProjectOverwatch : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
-			"Slate"
+			"Slate",
+			"Paper2D"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+		PrivateDependencyModuleNames.AddRange(new string[] 
+		{
+			"Paper2D"
+		});
 
 		PublicIncludePaths.AddRange(new string[] {
 			"ProjectOverwatch",

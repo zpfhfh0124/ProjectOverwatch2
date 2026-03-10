@@ -126,7 +126,7 @@ void AShuriken::Tick(float DeltaTime)
 		//UE_LOG(LogTemp, Warning, TEXT("%s Location : (%.2f, %.2f, %.2f)"), *name, vector.X, vector.Y, vector.Z);
 
 		/// 디버깅 ------------
-		FVector Current = GetActorLocation();
+		/*FVector Current = GetActorLocation();
 
 		DrawDebugLine(
 			GetWorld(),
@@ -139,7 +139,7 @@ void AShuriken::Tick(float DeltaTime)
 			1.5f
 		);
 
-		PrevLocation = Current;
+		PrevLocation = Current;*/
 		/// -------------------
 	}
 }
