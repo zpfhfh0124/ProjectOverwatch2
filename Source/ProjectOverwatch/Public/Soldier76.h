@@ -74,6 +74,17 @@ private:
 
 	FVector GetSpreadDirection(const FVector& BaseDir) const;
 
+	UPROPERTY(EditDefaultsOnly, Category="Weapon|Rocket")
+	float RocketCooldown = 6.f;
+
+	float RocketCooldownRemaining = 0.f;  // 0이면 사용 가능
+	bool bCanFireRocket = true;           // 시작부터 사용 가능
+
+	FTimerHandle RocketCooldownTimer;
+
+	void OnRocketCooldownFinished();
+	
+	
 public:
 	// 필요하면 LB(일반 총)도 여기서 구현
 	virtual void MouseLBComplete_Implementation() override;
