@@ -4,6 +4,7 @@
 #include "PlayerGenji.h"
 
 #include "Components/BoxComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 APlayerGenji::APlayerGenji()
 {
@@ -46,4 +47,30 @@ void APlayerGenji::SetReflectionBoxComp(bool Enable)
 	}
 	
 	ReflectionBoxComp->SetActive(Enable);
+}
+
+void APlayerGenji::OnHitReflection(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 팅겨내기 반사 콜리전 충돌
+	// 충돌체의 ProjectileMovementComponent 검사
+	auto* otherPMComp = OtherActor->GetComponentByClass<UProjectileMovementComponent>();
+	if (otherPMComp)
+	{
+		// 충돌체의 Velocity를 수정한다.
+		// 플레이어가 향하고 있는 방향으로 교체
+		FVector newVelocity = GetForwardDir().GetSafeNormal() * otherPMComp->InitialSpeed;
+		otherPMComp->SetVelocityInLocalSpace(newVelocity);
+
+		// Debug
+		DrawDebugSphere(
+			GetWorld(),
+			SweepResult.ImpactPoint,
+			10.f,
+			12,
+			FColor::Green,
+			false,
+			2.f
+		);
+	}
 }

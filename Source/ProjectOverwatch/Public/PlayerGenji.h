@@ -23,11 +23,15 @@ public :
 
 	// 팅겨내기 지속시간
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float EDuration = 2.f;
+	float EDuration = 3.f;
 	
 	virtual void BeginPlay() override;
 	virtual void InitIcons() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetReflectionBoxComp(bool Enable);
+	
+	UFUNCTION()
+	void OnHitReflection(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+						  int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

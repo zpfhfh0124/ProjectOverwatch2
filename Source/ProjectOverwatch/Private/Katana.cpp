@@ -76,7 +76,7 @@ void AKatana::OnKatanaHit(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 			FColor::Green,
 			false,
 			2.f
-);
+		);
 	}
 }
 
