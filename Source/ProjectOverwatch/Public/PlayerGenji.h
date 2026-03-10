@@ -27,6 +27,12 @@ public :
 	
 	virtual void BeginPlay() override;
 	virtual void InitIcons() override;
+	
+	// 팅겨내기 지속시간 카운트
+	UFUNCTION(BlueprintCallable)
+	void StartDurationSkillE();
+	UFUNCTION(BlueprintNativeEvent)
+	void EndDurationSkillE();
 
 	UFUNCTION(BlueprintCallable)
 	void SetReflectionBoxComp(bool Enable);

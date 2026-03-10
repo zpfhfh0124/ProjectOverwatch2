@@ -10,7 +10,7 @@ APlayerGenji::APlayerGenji()
 {
 	ReflectionBoxComp = CreateDefaultSubobject<UBoxComponent>("ReflectionBoxComp");
 	ReflectionBoxComp->SetupAttachment(GetRootComponent());
-	ReflectionBoxComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	ReflectionBoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ReflectionBoxComp->SetRelativeLocation(FVector(50, 0, 0));
 	ReflectionBoxComp->SetBoxExtent(FVector(20, 50, 80));
 	ReflectionBoxComp->SetCollisionProfileName(TEXT("BlueWeapon"));
@@ -20,13 +20,14 @@ void APlayerGenji::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetReflectionBoxComp(false);
-
 	// 쿨타임 지정
 	CountShiftCoolTime = 10.0f;
 	CountECoolTime = 5.0f;
 	
 	InitIcons();
+	
+	// 팅겨내기 콜리전 충돌 설정
+	ReflectionBoxComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerGenji::OnHitReflection);
 }
 
 void APlayerGenji::InitIcons()
@@ -38,6 +39,20 @@ void APlayerGenji::InitIcons()
 	Super::InitIcons();
 }
 
+void APlayerGenji::StartDurationSkillE()
+{
+	FTimerHandle TimerHandle;
+	FTimerDelegate TimerDelegate;
+	
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerGenji::EndDurationSkillE, EDuration, false);
+	SetReflectionBoxComp(true);
+}
+
+void APlayerGenji::EndDurationSkillE_Implementation()
+{
+	SetReflectionBoxComp(false);
+}
+
 void APlayerGenji::SetReflectionBoxComp(bool Enable)
 {
 	if (ReflectionBoxComp == nullptr)
@@ -46,7 +61,7 @@ void APlayerGenji::SetReflectionBoxComp(bool Enable)
 		return;
 	}
 	
-	ReflectionBoxComp->SetActive(Enable);
+	ReflectionBoxComp->SetCollisionEnabled(Enable ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
 }
 
 void APlayerGenji::OnHitReflection(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
