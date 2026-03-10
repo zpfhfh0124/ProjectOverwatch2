@@ -117,13 +117,13 @@ void AJunRocket::OnMyCompBeginOverlab(
 		if (OtherActor && (OtherActor == GetOwner() || OtherActor == GetInstigator()))
 		{
 			return;
-		}
+		} 
 	}
 	
 	//  Destroy 먼저 하지 말고, 마지막에!
     const FVector Center = GetActorLocation(); // 폭심지(간단히 로켓 위치)
 
-    const float Radius = 200.f;
+    const float Radius = 300.f;
 
     // FCollisionQueryParams Params(SCENE_QUERY_STAT(RocketExplosionOverlap), false);
     FCollisionQueryParams Params;
@@ -157,7 +157,7 @@ void AJunRocket::OnMyCompBeginOverlab(
             Dir = Dir.GetSafeNormal();
 
             // 솔져 느낌 튕김 값(튜닝)
-            const float KnockbackSpeed = 1200.f;
+            const float KnockbackSpeed = 300.f;
             const float UpBoost = 350.f;
 
             //  Character면 LaunchCharacter 가능

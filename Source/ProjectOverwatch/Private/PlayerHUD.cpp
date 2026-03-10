@@ -28,6 +28,32 @@ void UPlayerHUD::SetSkillShiftLIcon(UPaperSprite* Icon)
 	SkillShiftLIcon->SetBrushFromAtlasInterface(Icon);
 }
 
+void UPlayerHUD::SetCoolTimeSkillShiftL(const int coolTime)
+{
+	if (coolTime <= 0)
+	{
+		CoolTimeShiftL->SetText(FText::FromString("0"));
+		CoolTimeShiftL->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		CoolTimeShiftL->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void UPlayerHUD::SetCoolTimeSkillE(const int coolTime)
+{
+	if (coolTime <= 0)
+	{
+		CoolTimeE->SetText(FText::FromString("0"));
+		CoolTimeE->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		CoolTimeE->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
 void UPlayerHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
