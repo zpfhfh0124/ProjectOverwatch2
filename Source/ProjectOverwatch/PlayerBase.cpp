@@ -7,6 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 APlayerBase::APlayerBase()
