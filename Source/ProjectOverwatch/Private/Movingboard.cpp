@@ -10,7 +10,7 @@ AMovingBoard::AMovingBoard()
 	RootComponent = StaticMeshComp;
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(
-		TEXT("/Engine/BasicShapes/Cube.Cube")
+		TEXT("/Script/Engine.StaticMesh'/Game/Jun/Art/movingboardmodelfbx.movingboardmodelfbx'")
 	);
 	if (MeshAsset.Succeeded())
 	{

@@ -32,8 +32,8 @@ protected:
 	USceneComponent* FirePoint;
 
 	UPROPERTY(EditDefaultsOnly, Category="Weapon")
-	TEnumAsByte<ECollisionChannel> AimTraceChannel = ECC_Visibility;
-
+	TEnumAsByte<ECollisionChannel> AimTraceChannel;
+	
 	// Sprint
 	UPROPERTY(EditDefaultsOnly, Category="Movement")
 	float WalkSpeed = 600.f;
@@ -60,7 +60,7 @@ private:
 	float RifleRange = 30000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Weapon|Rifle")
-	TEnumAsByte<ECollisionChannel> RifleTraceChannel = ECC_Visibility;
+	TEnumAsByte<ECollisionChannel> RifleTraceChannel;
 
 	FTimerHandle RifleTimer;
 	bool bRifleFiring = false;
