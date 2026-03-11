@@ -32,8 +32,8 @@ protected:
 	USceneComponent* FirePoint;
 
 	UPROPERTY(EditDefaultsOnly, Category="Weapon")
-	TEnumAsByte<ECollisionChannel> AimTraceChannel = ECC_Visibility;
-
+	TEnumAsByte<ECollisionChannel> AimTraceChannel;
+	
 	// Sprint
 	UPROPERTY(EditDefaultsOnly, Category="Movement")
 	float WalkSpeed = 600.f;
@@ -60,7 +60,7 @@ private:
 	float RifleRange = 30000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Weapon|Rifle")
-	TEnumAsByte<ECollisionChannel> RifleTraceChannel = ECC_Visibility;
+	TEnumAsByte<ECollisionChannel> RifleTraceChannel;
 
 	FTimerHandle RifleTimer;
 	bool bRifleFiring = false;
@@ -89,4 +89,10 @@ public:
 	// 필요하면 LB(일반 총)도 여기서 구현
 	virtual void MouseLBComplete_Implementation() override;
 	virtual void MouseLBTrigger_Implementation() override;
+	
+	virtual void InitIcons() override;
+	
+	virtual void BeginPlay() override;
+	virtual void OnRep_PlayerState() override;
+	virtual void PossessedBy(AController* NewController) override;
 };

@@ -274,13 +274,16 @@ void APlayerBase::BeginPlay()
 void APlayerBase::InitIcons()
 {
 	// 자식 클래스에서 Path 설정 해주어야 함.
-	
-	auto* PS = Cast<AOverwatchPlayerState>(GetPlayerState());
+	auto PS = GetWorld()->GetFirstPlayerController()->GetPlayerState<AOverwatchPlayerState>();
 	if (PS)
 	{
 		PS->SetProjectileIcon(ProjectileIconPath);
 		PS->SetSkillEIcon(SkillEIconPath);
 		PS->SetSkillShiftLIcon(SkillShiftLIconPath);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AOverwatchPlayerState를 가져오지 못했다!"))
 	}
 }
 
@@ -346,4 +349,19 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EIC->BindAction(IA_Ctrl, ETriggerEvent::Started, this, &APlayerBase::OnCtrl);
 	EIC->BindAction(IA_Ctrl, ETriggerEvent::Completed, this, &APlayerBase::StopCtrl);
 	
+}
+
+void APlayerBase::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+}
+
+void APlayerBase::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+}
+
+void APlayerBase::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState)
+{
+	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
 }

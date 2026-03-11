@@ -25,11 +25,36 @@ void APlayerGenji::BeginPlay()
 	CountShiftCoolTime = 10.0f;
 	CountECoolTime = 5.0f;
 	
-	InitIcons();
-	
 	// 팅겨내기 콜리전 충돌 설정
 	SetReflectionBoxComp(false);
 	ReflectionBoxComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerGenji::OnHitReflection);
+	
+	InitIcons();
+}
+
+void APlayerGenji::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	if (IsShiftSkillActive)
+	{
+		CurrCoolTimeShift += DeltaTime;
+		if (CurrCoolTimeShift >= CountShiftCoolTime)
+		{
+			IsShiftSkillActive = false;
+			CurrCoolTimeShift = 0.0f;
+		}
+	}
+	
+	if (IsESkillActivate)
+	{
+		CurrCoolTimeE += DeltaTime;
+		if (CurrCoolTimeE >= CountECoolTime)
+		{
+			IsESkillActivate = false;
+			CurrCoolTimeE = 0.0f;
+		}
+	}
 }
 
 void APlayerGenji::InitIcons()
@@ -99,8 +124,22 @@ void APlayerGenji::OnHitReflection(UPrimitiveComponent* OverlappedComponent, AAc
 	}
 }
 
+void APlayerGenji::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	//InitIcons();
+}
+
+void APlayerGenji::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	//InitIcons();
+}
+
 void APlayerGenji::AttackHayate_Implementation()
 {
+	if (IsShiftSkillActive) return;
+	
 	FVector Forward = GetForwardDir().GetSafeNormal();
 	LaunchCharacter(Forward * HayatePower, false, false);
 	
@@ -108,6 +147,8 @@ void APlayerGenji::AttackHayate_Implementation()
 	{
 		GetWorldTimerManager().ClearTimer(HayateTimerHandle);
 	}
+	
+	IsShiftSkillActive = true;
 	
 	GetWorldTimerManager().SetTimer(
 		HayateTimerHandle, this, &APlayerGenji::EndHayate, HayateDuration, false);

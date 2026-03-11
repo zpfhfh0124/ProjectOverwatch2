@@ -10,6 +10,7 @@
 void AWuyang::BeginPlay()
 {
 	Super::BeginPlay();
+	InitIcons();
 }
 
 AWuyang::AWuyang()
@@ -137,4 +138,25 @@ void AWuyang::SpawnWaterBall()
 			}
 		}
 	}
+}
+
+void AWuyang::InitIcons()
+{
+	ProjectileIconPath = "/Script/Paper2D.PaperSprite'/Game/GT/UI/Sprites/Projectile_Genji_Sprite_0.Projectile_Genji_Sprite_0'";
+	SkillEIconPath = "/Script/Paper2D.PaperSprite'/Game/GT/UI/Sprites/Skill_Wuyang_Sprite_1.Skill_Wuyang_Sprite_1'";
+	SkillShiftLIconPath = "/Script/Paper2D.PaperSprite'/Game/GT/UI/Sprites/Skill_Wuyang_Sprite_0.Skill_Wuyang_Sprite_0'";
+	
+	Super::InitIcons();
+}
+
+void AWuyang::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	//InitIcons();
+}
+
+void AWuyang::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	//InitIcons();
 }
