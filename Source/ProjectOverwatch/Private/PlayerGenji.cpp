@@ -4,6 +4,7 @@
 #include "PlayerGenji.h"
 
 #include "Components/BoxComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 APlayerGenji::APlayerGenji()
@@ -38,6 +39,12 @@ void APlayerGenji::InitIcons()
 	SkillShiftLIconPath = "/Script/Paper2D.PaperSprite'/Game/GT/UI/Sprites/Skill_Genji_Sprite_0.Skill_Genji_Sprite_0'";
 	
 	Super::InitIcons();
+}
+
+void APlayerGenji::OnShift_Implementation()
+{
+	Super::OnShift_Implementation();
+	AttackHayate();
 }
 
 void APlayerGenji::StartDurationSkillE()
@@ -90,4 +97,32 @@ void APlayerGenji::OnHitReflection(UPrimitiveComponent* OverlappedComponent, AAc
 			2.f
 		);*/
 	}
+}
+
+void APlayerGenji::AttackHayate_Implementation()
+{
+	FVector Forward = GetForwardDir().GetSafeNormal();
+	LaunchCharacter(Forward * HayatePower, false, false);
+	
+	if (GetWorldTimerManager().GetTimerElapsed(HayateTimerHandle))
+	{
+		GetWorldTimerManager().ClearTimer(HayateTimerHandle);
+	}
+	
+	GetWorldTimerManager().SetTimer(
+		HayateTimerHandle, this, &APlayerGenji::EndHayate, HayateDuration, false);
+	
+	if (!HayateAnimMontage)
+	{
+		UE_LOG(LogTemp, Error, TEXT("질풍참 애니메이션 몽타주가 지정되어 있지 않음!"));
+		return;
+	}
+	PlayAnimMontage(HayateAnimMontage);
+}
+
+void APlayerGenji::EndHayate_Implementation()
+{
+	GetCharacterMovement()->StopMovementImmediately();
+	
+	if (HayateAnimMontage) StopAnimMontage(HayateAnimMontage);
 }
