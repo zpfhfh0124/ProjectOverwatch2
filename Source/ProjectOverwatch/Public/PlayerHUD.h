@@ -39,6 +39,10 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* CoolTimeE;
 	
+	// 영웅 변경 버튼
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BtnPlayerChange;
+	
 	// 소모형 무기 아이콘 설정
 	void SetProjectileIcon(UPaperSprite* Icon);
 	
@@ -55,7 +59,12 @@ public:
 	// 스킬 쿨타임
 	UFUNCTION()
 	void SetCoolTimeSkillShiftL(const int coolTime = 0);
+	UFUNCTION()
 	void SetCoolTimeSkillE(const int coolTime = 0);
+	
+	// 영웅 변경 버튼 On/Off
+	UFUNCTION()
+	void SetBtnPlayerChange(bool IsOn);
 
 	virtual void NativeConstruct() override;
 };
