@@ -7,6 +7,9 @@
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
 #include "OverwatchPlayerState.h"
+#include "PlayerHUD.h"
+#include "ProjectOverwatchPlayerController.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -266,7 +269,6 @@ void APlayerBase::BeginPlay()
 	
 	// 최대 1단 점프까지 가능하도록 설정
 	this->JumpMaxCount = 1;
-
 }
 
 void APlayerBase::InitIcons()
@@ -345,4 +347,3 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EIC->BindAction(IA_Ctrl, ETriggerEvent::Completed, this, &APlayerBase::StopCtrl);
 	
 }
-
