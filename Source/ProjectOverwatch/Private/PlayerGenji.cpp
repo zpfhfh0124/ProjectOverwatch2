@@ -104,7 +104,10 @@ void APlayerGenji::AttackHayate_Implementation()
 	FVector Forward = GetForwardDir().GetSafeNormal();
 	LaunchCharacter(Forward * HayatePower, false, false);
 	
-	if (GetWorldTimerManager().GetTimerElapsed(HayateTimerHandle)) return;
+	if (GetWorldTimerManager().GetTimerElapsed(HayateTimerHandle))
+	{
+		GetWorldTimerManager().ClearTimer(HayateTimerHandle);
+	}
 	
 	GetWorldTimerManager().SetTimer(
 		HayateTimerHandle, this, &APlayerGenji::EndHayate, HayateDuration, false);
