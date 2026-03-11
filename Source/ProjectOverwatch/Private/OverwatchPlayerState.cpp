@@ -60,6 +60,14 @@ void AOverwatchPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 	DOREPLIFETIME(AOverwatchPlayerState, ProjectileCurrCount);
 }
 
+void AOverwatchPlayerState::SetCoolTimeShift(float coolTime)
+{
+}
+
+void AOverwatchPlayerState::SetCoolTimeE(float coolTime)
+{
+}
+
 void AOverwatchPlayerState::SetProjectileIcon(const FString& Path)
 {
 	auto* PC = Cast<AProjectOverwatchPlayerController>(GetWorld()->GetFirstPlayerController());

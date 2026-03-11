@@ -89,4 +89,10 @@ public:
 	// 필요하면 LB(일반 총)도 여기서 구현
 	virtual void MouseLBComplete_Implementation() override;
 	virtual void MouseLBTrigger_Implementation() override;
+	
+	virtual void InitIcons() override;
+	
+	virtual void BeginPlay() override;
+	virtual void OnRep_PlayerState() override;
+	virtual void PossessedBy(AController* NewController) override;
 };
