@@ -12,7 +12,7 @@ APlayerGenji::APlayerGenji()
 	ReflectionBoxComp->SetupAttachment(GetRootComponent());
 	ReflectionBoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ReflectionBoxComp->SetRelativeLocation(FVector(50, 0, 0));
-	ReflectionBoxComp->SetBoxExtent(FVector(20, 50, 80));
+	ReflectionBoxComp->SetBoxExtent(FVector(50, 100, 100));
 	ReflectionBoxComp->SetCollisionProfileName(TEXT("BlueWeapon"));
 }
 
@@ -41,11 +41,12 @@ void APlayerGenji::InitIcons()
 
 void APlayerGenji::StartDurationSkillE()
 {
+	SetReflectionBoxComp(true);
+	
 	FTimerHandle TimerHandle;
 	FTimerDelegate TimerDelegate;
 	
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerGenji::EndDurationSkillE, EDuration, false);
-	SetReflectionBoxComp(true);
 }
 
 void APlayerGenji::EndDurationSkillE_Implementation()
