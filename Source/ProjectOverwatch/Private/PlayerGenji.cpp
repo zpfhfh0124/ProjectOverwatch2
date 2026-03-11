@@ -27,6 +27,7 @@ void APlayerGenji::BeginPlay()
 	InitIcons();
 	
 	// 팅겨내기 콜리전 충돌 설정
+	SetReflectionBoxComp(false);
 	ReflectionBoxComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerGenji::OnHitReflection);
 }
 
@@ -75,11 +76,11 @@ void APlayerGenji::OnHitReflection(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		// 충돌체의 Velocity를 수정한다.
 		// 플레이어가 향하고 있는 방향으로 교체
-		FVector newVelocity = GetForwardDir().GetSafeNormal() * otherPMComp->InitialSpeed;
-		otherPMComp->SetVelocityInLocalSpace(newVelocity);
+		FVector newVelocity = Controller->GetControlRotation().Vector().GetSafeNormal() * otherPMComp->InitialSpeed;
+		otherPMComp->Velocity = newVelocity;
 
 		// Debug
-		DrawDebugSphere(
+		/*DrawDebugSphere(
 			GetWorld(),
 			SweepResult.ImpactPoint,
 			10.f,
@@ -87,6 +88,6 @@ void APlayerGenji::OnHitReflection(UPrimitiveComponent* OverlappedComponent, AAc
 			FColor::Green,
 			false,
 			2.f
-		);
+		);*/
 	}
 }
