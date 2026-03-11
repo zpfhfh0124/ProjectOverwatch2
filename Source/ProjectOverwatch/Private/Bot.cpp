@@ -49,11 +49,14 @@ void ABot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CurrFireTime += DeltaTime;
-	if (CurrFireTime >= FireDelayTime)
+	if (IsFireModel)
 	{
-		FireBulletForward();
-		CurrFireTime = 0.0f;
+		CurrFireTime += DeltaTime;
+		if (CurrFireTime >= FireDelayTime)
+		{
+			FireBulletForward();
+			CurrFireTime = 0.0f;
+		}
 	}
 }
 

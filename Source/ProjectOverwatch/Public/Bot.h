@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "컴포넌트")
 	TObjectPtr<class UArrowComponent> FirePointB;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ABC")
+	bool IsFireModel = true;
+	
 	// 투사체 생성
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ABullet> BulletFactory;

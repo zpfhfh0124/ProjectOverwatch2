@@ -36,4 +36,9 @@ public:
 	AActor* CurrentWaterBall;
 	
 	void SpawnWaterBall();
+	
+	virtual void InitIcons() override;
+	
+	virtual void OnRep_PlayerState() override;
+	virtual void PossessedBy(AController* NewController) override;
 };

@@ -51,6 +51,17 @@ public:
 	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
+	// 쿨타임
+	UPROPERTY(BlueprintReadOnly)
+	float CurCoolTimeShift = 0.f;
+	UPROPERTY(BlueprintReadOnly)
+	float CurCoolTimeE = 0.f;
+	
+	// HUD 쿨타임 설정
+	UFUNCTION(BlueprintCallable)
+	void SetCoolTimeShift(float coolTime);
+	void SetCoolTimeE(float coolTime);
+	
 	// HUD 아이콘 설정
 	UFUNCTION(BlueprintCallable)
 	void SetProjectileIcon(const FString& Path);

@@ -17,6 +17,10 @@ class PROJECTOVERWATCH_API APlayerGenji : public APlayerBase
 public :
 	APlayerGenji();
 	
+	// 쿨타임
+	float CurrCoolTimeShift = 0.f;
+	float CurrCoolTimeE = 0.f;
+	
 	// 팅겨내기 콜리전
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UBoxComponent> ReflectionBoxComp;
@@ -38,8 +42,8 @@ public :
 	FTimerHandle HayateTimerHandle;
 	
 	virtual void BeginPlay() override;
+	virtual void Tick( float DeltaTime ) override;
 	virtual void InitIcons() override;
-	
 	virtual void OnShift_Implementation() override;
 	
 	// 팅겨내기 지속시간 카운트
@@ -60,4 +64,7 @@ public :
 	void AttackHayate();
 	UFUNCTION(BlueprintNativeEvent)
 	void EndHayate();
+	
+	virtual void OnRep_PlayerState() override;
+	virtual void PossessedBy(AController* NewController) override;
 };

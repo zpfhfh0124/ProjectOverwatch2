@@ -39,6 +39,7 @@ void UPlayerHUD::SetCoolTimeSkillShiftL(const int coolTime)
 	else
 	{
 		CoolTimeShiftL->SetVisibility(ESlateVisibility::Visible);
+		CoolTimeShiftL->SetText(FText::AsNumber(coolTime));
 	}
 }
 
@@ -52,6 +53,7 @@ void UPlayerHUD::SetCoolTimeSkillE(const int coolTime)
 	else
 	{
 		CoolTimeE->SetVisibility(ESlateVisibility::Visible);
+		CoolTimeE->SetText(FText::AsNumber(coolTime));
 	}
 }
 

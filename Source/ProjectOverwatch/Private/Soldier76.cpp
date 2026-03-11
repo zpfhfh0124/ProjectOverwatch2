@@ -21,6 +21,7 @@ ASoldier76::ASoldier76()
 	{
 		CMC->MaxWalkSpeed = WalkSpeed;
 	}
+	
 }
 
 void ASoldier76::OnShift_Implementation()
@@ -112,6 +113,33 @@ void ASoldier76::MouseLBTrigger_Implementation()
 	}
 }
 
+void ASoldier76::InitIcons()
+{
+	ProjectileIconPath = "/Script/Paper2D.PaperSprite'/Game/GT/UI/Sprites/Projectile_Genji_Sprite_0.Projectile_Genji_Sprite_0'";
+	SkillEIconPath = "/Script/Paper2D.PaperSprite'/Game/GT/UI/Sprites/Skill_Soldier76_Sprite_1.Skill_Soldier76_Sprite_1'";
+	SkillShiftLIconPath = "/Script/Paper2D.PaperSprite'/Game/GT/UI/Sprites/Skill_Soldier76_Sprite_0.Skill_Soldier76_Sprite_0'";
+	
+	Super::InitIcons();
+}
+
+void ASoldier76::BeginPlay()
+{
+	Super::BeginPlay();
+	InitIcons();
+}
+
+void ASoldier76::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	//InitIcons();
+}
+
+void ASoldier76::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	//InitIcons();
+}
+
 void ASoldier76::StartRifle()
 {
 	bRifleFiring = true;
@@ -164,15 +192,40 @@ void ASoldier76::FireRifleOnce()
 	Params.AddIgnoredActor(this);
 
 	const bool bHit = GetWorld()->LineTraceSingleByChannel(
-		Hit, Start, End, ECC_Visibility, Params
+		Hit, Start, End, RifleTraceChannel, Params
 	);
 
 	// Debug (원하면 지워도 됨)
-	DrawDebugLine(GetWorld(), Start, bHit ? Hit.ImpactPoint : End, FColor::Green, false, 0.2f, 0, 1.5f);
+	//DrawDebugLine(GetWorld(), Start, bHit ? Hit.ImpactPoint : End, FColor::Green, false, 0.2f, 0, 1.5f);
 	if (bHit)
 	{
 		DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 8.f, FColor::Red, false, 0.2f);
-		// TODO: 데미지/이펙트 처리
+		AActor* HitActor = Hit.GetActor();
+		if (HitActor)
+		{
+			const FString ActorName = HitActor->GetName();
+			if (ActorName.Contains(TEXT("bot"), ESearchCase::IgnoreCase))
+			{
+				// 현재 위치 저장 후 맵 아래로 이동
+				const FVector OriginalLocation = HitActor->GetActorLocation();
+				HitActor->SetActorLocation(OriginalLocation + FVector(0.f, 0.f, -50000.f));
+
+				// x초 후 원위치 복귀
+				FTimerHandle RespawnTimer;
+				GetWorldTimerManager().SetTimer(
+					RespawnTimer,
+					[HitActor, OriginalLocation]()
+					{
+						if (IsValid(HitActor))
+						{
+							HitActor->SetActorLocation(OriginalLocation);
+						}
+					},
+					2.f,
+					false
+				);
+			}
+		}
 	}
 }
 
