@@ -7,6 +7,9 @@
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
 #include "OverwatchPlayerState.h"
+#include "PlayerHUD.h"
+#include "ProjectOverwatchPlayerController.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -266,19 +269,21 @@ void APlayerBase::BeginPlay()
 	
 	// 최대 1단 점프까지 가능하도록 설정
 	this->JumpMaxCount = 1;
-
 }
 
 void APlayerBase::InitIcons()
 {
 	// 자식 클래스에서 Path 설정 해주어야 함.
-	
-	auto* PS = Cast<AOverwatchPlayerState>(GetPlayerState());
+	auto PS = GetWorld()->GetFirstPlayerController()->GetPlayerState<AOverwatchPlayerState>();
 	if (PS)
 	{
 		PS->SetProjectileIcon(ProjectileIconPath);
 		PS->SetSkillEIcon(SkillEIconPath);
 		PS->SetSkillShiftLIcon(SkillShiftLIconPath);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AOverwatchPlayerState를 가져오지 못했다!"))
 	}
 }
 
@@ -346,3 +351,17 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 }
 
+void APlayerBase::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+}
+
+void APlayerBase::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+}
+
+void APlayerBase::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState)
+{
+	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
+}

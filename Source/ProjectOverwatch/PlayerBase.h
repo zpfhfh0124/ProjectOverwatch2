@@ -146,12 +146,20 @@ public:
 	
 	FTimerHandle ShiftTimerHandle;
 	FTimerHandle ETimerHandle;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsShiftSkillActive = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsESkillActivate = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CountShiftCoolTime = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CountECoolTime = 1.0f;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
+	virtual void OnRep_PlayerState() override;
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState) override;
 };
