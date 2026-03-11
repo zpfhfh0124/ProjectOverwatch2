@@ -67,7 +67,24 @@ void ASoldier76::MoveInput(const FInputActionValue& Value)
 
 void ASoldier76::OnMouseRB_Implementation()
 {
+	if (!bCanFireRocket) return;  // 쿨타임 중이면 무시
+
 	FireRocket();
+
+	// 쿨타임 시작
+	bCanFireRocket = false;
+	GetWorldTimerManager().SetTimer(
+		RocketCooldownTimer,
+		this,
+		&ASoldier76::OnRocketCooldownFinished,
+		RocketCooldown,
+		false  // 반복 X
+	);
+}
+
+void ASoldier76::OnRocketCooldownFinished()
+{
+	bCanFireRocket = true;
 }
 
 void ASoldier76::MouseLBTrigger_Implementation()
