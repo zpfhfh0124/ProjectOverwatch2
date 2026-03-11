@@ -5,6 +5,7 @@
 
 #include "OverwatchPlayerState.h"
 #include "PaperSprite.h"
+#include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
@@ -52,6 +53,11 @@ void UPlayerHUD::SetCoolTimeSkillE(const int coolTime)
 	{
 		CoolTimeE->SetVisibility(ESlateVisibility::Visible);
 	}
+}
+
+void UPlayerHUD::SetBtnPlayerChange(bool IsOn)
+{
+	BtnPlayerChange->SetVisibility(IsOn ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 void UPlayerHUD::NativeConstruct()
